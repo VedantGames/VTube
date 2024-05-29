@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt');
 console.log('exaactly yahi par h');
 const mongoose = require('mongoose');
 
-const userSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({ 
   userName: {
     type: String,
     required: true,
