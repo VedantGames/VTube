@@ -1,5 +1,5 @@
 console.log('yaha par he kya');
-// const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 console.log('exaactly yahi par h');
 const mongoose = require('mongoose');
 

@@ -4,7 +4,7 @@ const cors = require('cors');
 const app = express();
 console.log('created app');
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'https://vtube-vedant.vercel.app',
   credentials: true
 }))
 
