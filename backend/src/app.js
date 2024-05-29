@@ -11,8 +11,9 @@ app.use(cors({
 console.log('origin set');
 
 app.use(express.json());
-console.log('creating router');
+console.log('creating router 1');
 const userRouter = require('./routes/user.route');
+console.log('creating router 2');
 const videoRouter = require('./routes/video.route');
 
 console.log('assigning router');
