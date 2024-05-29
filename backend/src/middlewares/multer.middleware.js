@@ -26,5 +26,4 @@ const videosStorage = new CloudinaryStorage({
 
 const multerUploadImg = multer({ storage: imagesStorage });
 const multerUploadVid = multer({ storage: videosStorage });
-console.log('me bol rha tha yahi par h');
 module.exports = { multerUploadImg, multerUploadVid };

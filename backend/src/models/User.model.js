@@ -1,6 +1,4 @@
-console.log('yaha par he kya');
 // const bcrypt = require('bcrypt');
-console.log('exaactly yahi par h');
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({ 
@@ -71,7 +69,6 @@ userSchema.methods.isCorrectPassword = async function (password) {
   // return await bcrypt.compare(password, this.password);
   return this.password === password;
 };
-console.log('ha yahi par he');
 
 userSchema.methods.addVideo = async function (videoURL) {
   this.videos.push(videoURL);
