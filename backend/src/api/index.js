@@ -2,8 +2,8 @@ console.log("starting");
 require('dotenv').config();
 console.log("dotenv configged");
 
-const connectDB = require('./db/index');
-const app = require('./app');
+const connectDB = require('../db/index');
+const app = require('../app');
 console.log('connecting');
 
 connectDB().then(() => {
