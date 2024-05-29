@@ -1,7 +1,10 @@
 const Router = require('express');
 
+console.log('importing');
 const { registerUser, loginUser, uploadProfileImage, uploadProfileBanner, getUserHistory, getChannel, subscribe, unsubscribe, getSubscriptions } = require('../controllers/User.controller');
+console.log('yaha par bhi ho sakta h');
 const {multerUploadImg} = require('../middlewares/multer.middleware');
+console.log('bilkul yahi par h');
 
 const router = Router();
 console.log('user router created');

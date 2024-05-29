@@ -1,4 +1,6 @@
+console.log('yaha par he kya');
 const bcrypt = require('bcrypt');
+console.log('exaactly yahi par h');
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -60,7 +62,7 @@ const userSchema = new mongoose.Schema({
 
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) return next();
-
+  
   this.password = await bcrypt.hash(this.password, 10)
   next();
 });
@@ -68,6 +70,7 @@ userSchema.pre('save', async function (next) {
 userSchema.methods.isCorrectPassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
+console.log('ha yahi par he');
 
 userSchema.methods.addVideo = async function (videoURL) {
   this.videos.push(videoURL);
