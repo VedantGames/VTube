@@ -1,0 +1,87 @@
+.allVideosContainer {
+  padding-top: 2rem;
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  padding-right: 0.5rem;
+  padding-left: 0.5rem;
+  height: 100%;
+}
+
+.thumbnail {
+  height: 86px;
+}
+
+.title {
+}
+
+.othText {
+
+}
+
+@media (min-width: 420px) {
+  .thumbnail {
+    height: 121px;
+  }
+}
+
+@media (min-width: 510px) {
+  .thumbnail {
+    height: 140px;
+  }
+}
+
+@media (min-width: 600px) {
+  .thumbnail {
+    height: 165px;
+  }
+}
+
+@media (min-width: 700px) {
+  .thumbnail {
+    height: 190px;
+  }
+}
+
+@media (min-width: 950px) {
+  .thumbnail {
+    height: 145px;
+  }
+  .allVideosContainer {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+    padding-right: 1.25rem;
+    padding-left: 1.25rem;
+  }
+}
+
+@media (min-width: 1320px) {
+  .allVideosContainer {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-right: 2rem;
+    padding-left: 2rem;
+  }
+}
+
+@media (min-width: 1580px) {
+  .thumbnail {
+    height: 195px;
+  }
+  .allVideosContainer {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding-right: 2rem;
+    padding-left: 2rem;
+    padding-top: 4rem;
+  }
+}
+
+@media (min-width: 1800px) {
+  .thumbnail {
+    height: 175px;
+  }
+  .allVideosContainer {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    padding-right: 1.8rem;
+    padding-left: 1.8rem;
+  }
+}
