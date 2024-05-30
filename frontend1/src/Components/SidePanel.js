@@ -52,7 +52,7 @@ function SidePanel({ showSidePanel, setShowSidePanel }) {
             Shorts
           </h1>
         </Link>
-        <Link className={'flex h-10 py-2.5 bg-zinc-800 hover:bg-opacity-100 w-52 rounded-xl ' + getOpacity('subscriptions')} onClick={() => selectSlide('subscriptions')}>
+        <Link to={'/subscriptions'} className={'flex h-10 py-2.5 bg-zinc-800 hover:bg-opacity-100 w-52 rounded-xl ' + getOpacity('subscriptions')} onClick={() => selectSlide('subscriptions')}>
           <div className='ml-4 mr-6 mb-1'>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 8.25H9m6 3H9m3 6-3-3h1.5a3 3 0 1 0 0-6M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -165,7 +165,7 @@ function SidePanel({ showSidePanel, setShowSidePanel }) {
         <h1 className='font-semibold text-base ml-3 mr-6 mb-2'>
           Explore
         </h1>
-        <Link className={'flex h-10 py-2.5 bg-zinc-800 hover:bg-opacity-100 w-52 rounded-xl ' + getOpacity('trending')} onClick={() => selectSlide('trending')}>
+        <Link to={'/trendings'} className={'flex h-10 py-2.5 bg-zinc-800 hover:bg-opacity-100 w-52 rounded-xl ' + getOpacity('trending')} onClick={() => selectSlide('trending')}>
           <div className='ml-4 mr-6 mb-1'>
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15.362 5.214A8.252 8.252 0 0 1 12 21 8.25 8.25 0 0 1 6.038 7.047 8.287 8.287 0 0 0 9 9.601a8.983 8.983 0 0 1 3.361-6.867 8.21 8.21 0 0 0 3 2.48Z" />

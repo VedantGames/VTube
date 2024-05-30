@@ -11,8 +11,13 @@ import { useState } from 'react';
 import HistoryPage from './Pages/History';
 import SearchPage from './Pages/Search';
 import ChannelPage from './Pages/Channel';
+import Subscriptions from './Pages/Subscriptions';
+import TrendingPage from './Pages/Trending';
+import YouPage from './Pages/You';
 
-axios.defaults.baseURL = 'https://vtube-server.vercel.app/api/v1';
+const baseURLS = ['https://vtube-server.vercel.app/api/v1', 'http://localhost:8000/api/v1'];
+
+axios.defaults.baseURL = baseURLS[0];
 axios.defaults.withCredentials = true;
 
 function App() {
@@ -23,6 +28,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Layout showSidePanel={showSidePanel} setShowSidePanel={setShowSidePanel} />}>
           <Route index element={<Home showSidePanel={showSidePanel} setShowSidePanel={setShowSidePanel} />} />
+          <Route path='/subscriptions' element={<Subscriptions />} />
           <Route path='/register' element={<Register />} />
           <Route path='/login' element={<Login />} />
           <Route path='/video/:videoId' element={<VideoPage showSidePanel={showSidePanel} setShowSidePanel={setShowSidePanel} />} />
@@ -30,6 +36,8 @@ function App() {
           <Route path='/channel/:channelName' element={<ChannelPage />} />
           <Route path='/account' element={<Account />} />
           <Route path='/history' element={<HistoryPage />} />
+          <Route path='/trendings' element={<TrendingPage />} />
+          <Route path='/you' element={<YouPage />} />
         </Route>
       </Routes>
     </UserContextProvider>

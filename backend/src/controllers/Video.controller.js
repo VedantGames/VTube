@@ -128,7 +128,7 @@ const getAllVideos = asyncHandeller( async (req, res) => {
         timePassed: timePassed(videos[i].createdAt),
         duration: calcDuration(Math.round(videos[i].duration)),
         channelImg: owner.profileImage,
-        channelName: owner.userName
+        channelName: owner.fullName
       });
     }
   }
@@ -161,6 +161,83 @@ const getVideo = asyncHandeller( async (req, res) => {
     new ApiResponse(200, { video: fVideo, channel }, 'Success')
   );
 });
+
+const getSubscriptionVideos = asyncHandeller( async (req, res) => {
+  const { userId } = req.params;
+
+  if (userId === undefined || userId === '') throw new ApiError(400, 'User not found');
+
+  const userSubscriptions = await User.findById(userId).select('subscriptions');
+
+  const videos = await Video.find({ owner: { $in: userSubscriptions.subscriptions } }).sort({ createdAt: -1 }).limit(20);
+  videos.sort((a, b) => b.views - a.views);
+  
+  var finalVideos = [];
+  var owner = null;
+  for (let i = 0; i < videos.length; i++) {
+    if (i === 0) videos[i].duration = 560;
+    if (i === 1) videos[i].duration = 459;
+    if (i === 2) videos[i].duration = 1268;
+    if (i === 3) videos[i].duration = 25789;
+    if (i === 4) videos[i].duration = 592;
+    if (i === 5) videos[i].duration = 608;
+    if (i === 6) videos[i].duration = 115;
+    owner = await User.findById(videos[i].owner);
+
+    if (videos[i].visiblity === "Public") {
+      finalVideos.push({
+        _id: videos[i]._id,
+        thumbnail: videos[i].thumbnail,
+        title: videos[i].title,
+        views: videos[i].views,
+        timePassed: timePassed(videos[i].createdAt),
+        duration: calcDuration(Math.round(videos[i].duration)),
+        channelImg: owner.profileImage,
+        channelName: owner.fullName
+      });
+    }
+  }
+  
+  return res.status(200).json(
+    new ApiResponse(200, finalVideos)
+  );
+});
+
+const getTrendingVideos = asyncHandeller( async (req, res) => {
+  const videos = await Video.find().sort({ createdAt: -1 }).limit(20);
+
+  videos.sort((a, b) => b.views - a.views);
+
+  var finalVideos = [];
+  var owner = null;
+  for (let i = 0; i < videos.length; i++) {
+    if (i === 0) videos[i].duration = 560;
+    if (i === 1) videos[i].duration = 459;
+    if (i === 2) videos[i].duration = 1268;
+    if (i === 3) videos[i].duration = 25789;
+    if (i === 4) videos[i].duration = 592;
+    if (i === 5) videos[i].duration = 608;
+    if (i === 6) videos[i].duration = 115;
+    owner = await User.findById(videos[i].owner);
+
+    if (videos[i].visiblity === "Public") {
+      finalVideos.push({
+        _id: videos[i]._id,
+        thumbnail: videos[i].thumbnail,
+        title: videos[i].title,
+        views: videos[i].views,
+        timePassed: timePassed(videos[i].createdAt),
+        duration: calcDuration(Math.round(videos[i].duration)),
+        channelName: owner.fullName,
+        description: videos[i].descripton
+      });
+    }
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, finalVideos)
+  );
+})
 
 const search = asyncHandeller( async (req, res) => {
   const { query } = req.params;
@@ -235,5 +312,7 @@ module.exports = {
   getChannelVideos,
   getAllVideos,
   getVideo,
+  getSubscriptionVideos,
+  getTrendingVideos,
   search
 }

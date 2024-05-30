@@ -183,6 +183,46 @@ const getUserHistory = asyncHandeller( async (req, res) => {
   );
 });
 
+const getYouHistory = asyncHandeller( async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+  
+  if (!user) throw new ApiError(400, 'User not found');
+
+  const userHistory = await user.watchHistory.slice(-16);
+
+  var videos = [];
+  var video = null;
+  var owner = null;
+  var duration = 0;
+  for (let i = userHistory.length - 1; i >= 0; i--) {
+    video = await Video.findById(userHistory[i]);
+    owner = await User.findById(video.owner);
+    if (i === userHistory.length - 0) duration = 560;
+    if (i === userHistory.length - 1) duration = 459;
+    if (i === userHistory.length - 2) duration = 1268;
+    if (i === userHistory.length - 3) duration = 25789;
+    if (i === userHistory.length - 4) duration = 592;
+    if (i === userHistory.length - 5) duration = 608;
+    if (i === userHistory.length - 6) duration = 115;
+    
+    videos.push({
+      _id: video._id,
+      thumbnail: video.thumbnail,
+      title: video.title,
+      views: video.views,
+      duration: calcDuration(duration),
+      channelName: owner.fullName,
+      description: video.descripton
+    });
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, videos, 'User history')
+  );
+});
+
 const getChannel = asyncHandeller( async (req, res) => {
   const { channelName } = req.params;
 
@@ -224,6 +264,7 @@ module.exports = {
   subscribe,
   unsubscribe,
   getUserHistory,
+  getYouHistory,
   getChannel,
   getSubscriptions
 };

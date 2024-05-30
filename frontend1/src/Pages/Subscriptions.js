@@ -1,17 +1,22 @@
-import React, { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
-import './Home.css';
+import React, { useContext, useEffect, useState } from 'react'
+import { User } from '../Contexts/User.Context'
+import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Image, Transformation } from 'cloudinary-react';
 
-function Home({ showSidePanel, setShowSidePanel }) {
+function Subscriptions() {
+  const { user } = useContext(User);
   const [videos, setVideos] = useState([]);
-
-  setShowSidePanel(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('videos/all-videos').then(({data}) => setVideos(data.data)).catch(err => console.error(err));
-  }, [])
+    if (!user) navigate('/register');
+    else
+      axios
+        .get('/videos/subscriptions/' + user._id)
+        .then(({data}) => setVideos(data.data))
+        .catch(err => console.log(err));
+  }, [user]);
 
   return (
     <div className='allVideosContainer'>
@@ -61,4 +66,4 @@ function Home({ showSidePanel, setShowSidePanel }) {
   )
 }
 
-export default Home
+export default Subscriptions

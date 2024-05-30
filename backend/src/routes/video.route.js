@@ -1,7 +1,7 @@
 const Router = require('express');
 
 const { multerUploadVid } = require('../middlewares/multer.middleware');
-const { uploadVideo, uploadThumbnail, publishVideo, getChannelVideos, getAllVideos, getVideo, search } = require('../controllers/Video.controller');
+const { uploadVideo, uploadThumbnail, publishVideo, getChannelVideos, getAllVideos, getVideo, search, getSubscriptionVideos, getTrendingVideos } = require('../controllers/Video.controller');
 
 const router = Router();
 
@@ -13,5 +13,7 @@ router.route('/channel-videos/:channelId').get(getChannelVideos);
 router.route('/all-videos').get(getAllVideos);
 router.route('/video/:userId/:videoId').get(getVideo);
 router.route('/search/:query').get(search);
+router.route('/subscriptions/:userId').get(getSubscriptionVideos);
+router.route('/trending').get(getTrendingVideos);
 
 module.exports = router;

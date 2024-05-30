@@ -27,12 +27,12 @@ function Header() {
   return (
     <div className="md:px-5 px-2 py-3 flex justify-between">
       <div className="mr-0 flex">
-        <div className="flex items-center">
+        <div className="lg:flex items-center hidden">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7">
             <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
           </svg>
         </div>
-        <Link to={'/'} className="flex items-center md:pl-5 pl-2">
+        <Link to={'/'} className="relative flex items-center md:pl-5 pl-2">
           <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 z-10" viewBox="0 0 576 512"><path fill="#ff0000" d="M549.7 124.1c-6.3-23.7-24.8-42.3-48.3-48.6C458.8 64 288 64 288 64S117.2 64 74.6 75.5c-23.5 6.3-42 24.9-48.3 48.6-11.4 42.9-11.4 132.3-11.4 132.3s0 89.4 11.4 132.3c6.3 23.7 24.8 41.5 48.3 47.8C117.2 448 288 448 288 448s170.8 0 213.4-11.5c23.5-6.3 42-24.2 48.3-47.8 11.4-42.9 11.4-132.3 11.4-132.3s0-89.4-11.4-132.3zm-317.5 213.5V175.2l142.7 81.2-142.7 81.2z"/></svg>
           <span className="absolute bg-white h-2 w-4 ml-3"></span>
           <h1 className="font-bold text-xl mt-0.5 ml-1" style={{fontFamily: 'arial'}}>VTube</h1>

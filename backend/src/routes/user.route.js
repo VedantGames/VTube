@@ -1,6 +1,6 @@
 const Router = require('express');
 
-const { registerUser, loginUser, uploadProfileImage, uploadProfileBanner, getUserHistory, getChannel, subscribe, unsubscribe, getSubscriptions } = require('../controllers/User.controller');
+const { registerUser, loginUser, uploadProfileImage, uploadProfileBanner, getUserHistory, getChannel, subscribe, unsubscribe, getSubscriptions, getYouHistory } = require('../controllers/User.controller');
 const {multerUploadImg} = require('../middlewares/multer.middleware');
 
 const router = Router();
@@ -13,6 +13,7 @@ router.route('/subscribe').post(subscribe);
 router.route('/unsubscribe').post(unsubscribe);
 
 router.route('/user-history/:userId').get(getUserHistory);
+router.route('/you-history/:userId').get(getYouHistory);
 router.route('/channel/:channelName').get(getChannel);
 router.route('/subscriptions/:userId').get(getSubscriptions);
 
