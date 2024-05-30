@@ -3,26 +3,44 @@ import { useContext, useEffect, useState } from 'react';
 import { User } from '../Contexts/User.Context';
 import { Image, Transformation } from 'cloudinary-react';
 
-function Header() {
-  const {user} = useContext(User);
-  const navigate = useNavigate();
-  const [searchQuery, setSearchQuery] = useState('');
-  const [navigateQuery, setNavigateQuery] = useState('');
+function SearchHeader({
+  searchQuery, setSearchQuery,
+  setShowSearchHeader, search
+}) {
+  return (
+    <div className='flex justify-center items-center gap-2 px-2 py-3 w-full'>
+      <button onClick={() => setShowSearchHeader(false)}>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="size-6">
+          <path fillRule="evenodd" d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z" clipRule="evenodd" />
+        </svg>
+      </button>
+      <div className='w-full'>
+        <div className="flex items-center w-full bg-gray-800 px-4 py-1 rounded-full">
+          <input 
+            type="text" 
+            placeholder="Search" 
+            id='searchBar'
+            className="w-full outline-none bg-transparent"
+            value={searchQuery}
+            onChange={e => setSearchQuery(e.target.value)}
+            onKeyUp={event => search()}
+          />
+        </div>
+      </div>
+      <div className="flex justify-center items-center p-1.5 bg-gray-800 rounded-full">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+              <path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" />
+              <path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" />
+            </svg>
+        </div>
+    </div>
+  );
+}
 
-  const search1 = () => setNavigateQuery('search/'+searchQuery);
-
-  const [timeout, st] = useState(null);
-  
-  const search = () => {
-    clearTimeout(timeout);
-
-    if (searchQuery !== '')
-      st(setTimeout(() => navigate('search/'+searchQuery), 200));
-  };
-
-  useEffect(() => {
-    navigate(navigateQuery);
-  }, [navigateQuery])
+function NormalHeader({
+  searchQuery, setSearchQuery,
+  setShowSearchHeader, search, user
+}) {
 
   return (
     <div className="md:px-5 px-2 py-3 flex justify-between">
@@ -65,11 +83,11 @@ function Header() {
         </div>
       </div>
       <div className="flex items-center gap-5 justify-end">
-        <div className="block md:hidden lg:hidden">
+        <button onClick={() => setShowSearchHeader(true)} className="block md:hidden lg:hidden">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
             <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
           </svg>
-        </div>
+        </button>
         <div>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
             <path strokeLinecap="round" strokeLinejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
@@ -98,6 +116,40 @@ function Header() {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+function Header() {
+  const {user} = useContext(User);
+  const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
+  const [navigateQuery, setNavigateQuery] = useState('');
+
+  const search1 = () => setNavigateQuery('search/'+searchQuery);
+  
+  const [showSearchHeader, setShowSearchHeader] = useState(false);
+
+  const [timeout, st] = useState(null);
+  
+  const search = () => {
+    clearTimeout(timeout);
+
+    if (searchQuery !== '')
+      st(setTimeout(() => navigate('search/'+searchQuery), 200));
+  };
+
+  useEffect(() => {
+    navigate(navigateQuery);
+  }, [navigateQuery])
+
+  return (
+    <div>
+      {!showSearchHeader ? (
+        <NormalHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} setShowSearchHeader={setShowSearchHeader} search={search} user={user}></NormalHeader>
+      ) : (
+        <SearchHeader searchQuery={searchQuery} setSearchQuery={setSearchQuery} setShowSearchHeader={setShowSearchHeader} search={search}></SearchHeader>
+      )}
     </div>
   );
 }

@@ -14,6 +14,7 @@ import ChannelPage from './Pages/Channel';
 import Subscriptions from './Pages/Subscriptions';
 import TrendingPage from './Pages/Trending';
 import YouPage from './Pages/You';
+import SearchPageMobile from './Pages/SearchPage';
 
 const baseURLS = ['https://vtube-server.vercel.app/api/v1', 'http://localhost:8000/api/v1'];
 
@@ -38,6 +39,7 @@ function App() {
           <Route path='/history' element={<HistoryPage />} />
           <Route path='/trendings' element={<TrendingPage />} />
           <Route path='/you' element={<YouPage />} />
+          <Route path='/search-mobile' element={<SearchPageMobile />} />
         </Route>
       </Routes>
     </UserContextProvider>

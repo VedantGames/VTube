@@ -1,9 +1,11 @@
 import axios from 'axios';
 import { Image, Transformation } from 'cloudinary-react';
-import React, { useEffect, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import React, { useContext, useEffect, useState } from 'react'
+import { Link, Navigate, useParams } from 'react-router-dom'
+import { User } from '../Contexts/User.Context';
 
 function SearchPage() {
+  const { user, setUser } = useContext(User);
   const { query } = useParams();
 
   const [searchData, setSearchData] = useState(null);
@@ -15,14 +17,33 @@ function SearchPage() {
       .catch(err => console.error(err));
   }, [query])
 
+  const subscribe = (channelId) => {
+    if (!user) return <Navigate to={'/login'} />;
+    axios
+      .post('/users/subscribe', { userId: user._id, channelId })
+      .then(({data}) => {
+        setUser(data.data.user);
+      })
+      .catch(err => console.log(err))
+  }
+
+  const unsubscribe = (channelId) => {
+    axios
+      .post('/users/unsubscribe', { userId: user._id, channelId })
+      .then(({data}) => {
+        setUser(data.data.user);
+      })
+      .catch(err => console.log(err))
+  }
+
   return (
-    <div className='2xl:px-52 mt-10 w-full text-[arial]'>
+    <div className='2xl:px-52 lg:px-40 md:px-20 px-5 mt-10 w-full text-[arial]'>
       {searchData && (
         <div className='w-full'>
           <div className='flex flex-col gap-5'>
             {searchData.channels && searchData.channels.map(channel => (
-              <Link to={'/channel/'+channel.userName} key={channel._id} className='flex'>
-                <div className='w-96 ml-28'>
+              <Link to={'/channel/'+channel.userName} key={channel._id} className='flex w-full justify-around'>
+                <div className='w-96 min-w-28 2xl:ml-28'>
                   {channel.img !== '' ? (
                     <Image cloudName='dcpi2varq' publicId={channel.img} className='rounded-full' >
                       <Transformation scale='crop' height='100' width='100'/>
@@ -35,17 +56,17 @@ function SearchPage() {
                 </div>
                 <div className='ml-8 w-full'>
                   <div className='mt-5'>
-                    <h1 className='text-3xl font-bold'>
+                    <h1 className='2xl:text-3xl lg:text-2xl text-sm font-bold'>
                       {channel.name}
                     </h1>
                   </div>
-                  <div className='text-[#aaa] mt-3 text-sm'>
+                  <div className='text-[#aaa] mt-3 xl:text-sm md:text-xs text-[0.68rem]'>
                     <div>
                       <h1>
                         @{channel.userName} ‧ {channel.subscribers} subscribers
                       </h1>
                     </div>
-                    <div>
+                    <div className='md:block hidden'>
                       <h1 className='line-clamp-1'>
                         {channel.bio}
                       </h1>
@@ -53,9 +74,15 @@ function SearchPage() {
                   </div>
                 </div>
                 <div className='flex items-center'>
-                  <button className='bg-[#f1f1f1] text-[#0f0f0f] font-bold rounded-full px-3.5 py-2'>
-                    Subscribe
-                  </button>
+                  {(user && user.subscriptions.some(subscription => subscription == channel._id)) ? (
+                    <button className='bg-[#272727] hover:bg-[#333] text-[#f1f1f1] md:text-base text-sm md:font-bold rounded-full md:px-3.5 px-2 md:py-2 py-1' onClick={unsubscribe}>
+                      Subscribed
+                    </button>
+                  ) : (
+                    <button className='bg-[#f1f1f1] hover:bg-[#ddd] text-[#0f0f0f] md:text-base text-sm md:font-bold rounded-full md:px-3.5 px-2 md:py-2 py-1' onClick={subscribe}>
+                      Subscribe
+                    </button>
+                  )}
                 </div>
               </Link>
             ))}
@@ -63,9 +90,9 @@ function SearchPage() {
               <hr className='my-5 border-[#3f3f3f]' />
             )}
           </div>
-          <div className='flex flex-col gap-5'>
+          <div className='flex flex-col gap-5 md:px-0 sm:px-16'>
             {searchData.videos && searchData.videos.map(video => (
-              <Link to={'/video/'+video._id} key={video._id} className='grid grid-cols-[1.35fr_2fr] h-72'>
+              <Link to={'/video/'+video._id} key={video._id} className='grid 2xl:grid-cols-[1.35fr_2fr] md:grid-cols-[1fr_1fr] md:h-72'>
                 <div className='relative h-full'>
                   <Image cloudName='dcpi2varq' publicId={video.thumbnail} className='w-full h-full' >
                     <Transformation scale='crop' height='280' width='500' radius='10' />
@@ -78,11 +105,11 @@ function SearchPage() {
                 </div>
                 <div className='ml-3'>
                   <div>
-                    <h1 className='text-2xl font-semibold'>
+                    <h1 className='xl:text-2xl text-lg font-semibold'>
                       {video.title}
                     </h1>
                   </div>
-                  <div className='text-[#aaa] text-sm'>
+                  <div className='text-[#aaa] xl:text-sm md:text-xs text-[0.68rem] md:mb-0 mb-2'>
                     <div>
                       <h1>
                         {video.views} views ‧ {video.timePassed} ago
