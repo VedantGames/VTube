@@ -23,7 +23,7 @@ function TrendingPage() {
       </div>
       <div className='flex flex-col gap-5 2xl:mt-20 lg:mt-10 mt-5 2xl:pr-[20rem] lg:pr-28'>
         {videos && videos.map((video, i) => (
-          <Link to={'/video/'+video._id} key={i} className='grid grid-cols-[1fr_2.5fr] w-full'>
+          <Link to={'/video/'+video._id} key={i} className='grid sm:grid-cols-[1fr_2fr] w-full'>
             <div className='relative'>
               <Image cloudName='dcpi2varq' publicId={video.thumbnail} >
                 <Transformation crop='scale' radius='10' height='300' width='530' />
@@ -34,13 +34,13 @@ function TrendingPage() {
                 </h1>
               </div>
             </div>
-            <div className='ml-4'>
+            <div className='sm:ml-4 ml-1 sm:mt-0 mt-1'>
               <div>
-                <h1 className='lg:text-lg md:text-base sm:text-sm text-[0.6rem] font-semibold line-clamp-3'>
+                <h1 className='lg:text-lg md:text-base sm:text-sm text-lg font-semibold line-clamp-3'>
                   {video.title}
                 </h1>
               </div>
-              <div className='text-[#AAA] sm:text-xs text-[0.5rem]'>
+              <div className='text-[#AAA] sm:text-xs text-xs'>
                 <div>
                   {video.channelName} ‧ {video.views} views ‧ {video.timePassed} ago
                 </div>

@@ -5,10 +5,10 @@ function Footer() {
   const [currentSlide, setCurrentSlide] = useState('home');
 
   return (
-    <div className='fixed w-full bottom-0 right-0 bg-primary lg:hidden block z-50'>
+    <div className='fixed w-full bottom-0 right-0 pb-2 bg-primary lg:hidden block z-50'>
       <hr />
       <div className='w-full'>
-        <div className='flex justify-between px-6'>
+        <div className='flex justify-between sm:px-40 px-6'>
           <Link to={'/'} onClick={() => setCurrentSlide('home')}>
             {currentSlide !== 'home' ? (
               <svg xmlns="http://www.w3.org/2000/svg" fill="black" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-7">
