@@ -1,3 +1,4 @@
+const Comment = require("../models/Comment.model");
 const User = require("../models/User.model");
 const Video = require("../models/Video.model");
 const ApiError = require("../utils/ApiError");
@@ -69,6 +70,138 @@ const publishVideo = asyncHandeller( async (req, res) => {
   return res.status(200).json(
     new ApiResponse(200, { user: userAfterVideoPublished }, 'Video published successfully')
   );
+});
+
+
+const subscribe = asyncHandeller( async (req, res) => {
+  const { userId, channelId } = req.body;
+
+  const user = await User.findById(userId);
+  
+  if (!user) throw new ApiError(400, 'User not found');
+  
+  const channel = await User.findById(channelId);
+  
+  if (!channel) throw new ApiError(400, 'Channel not found');
+  
+  const finalUser = await user.subscribe(channelId);
+  
+  const finalChannel = await channel.addSubscriber();
+
+  return res.status(200).json(
+    new ApiResponse(200, { user: finalUser, channel: finalChannel }, "Subscribed successfully")
+  );
+});
+
+const unsubscribe = asyncHandeller( async (req, res) => {
+  const { userId, channelId } = req.body;
+
+  const user = await User.findById(userId);
+  
+  if (!user) throw new ApiError(400, 'User not found');
+  
+  const channel = await User.findById(channelId);
+  
+  if (!channel) throw new ApiError(400, 'Channel not found');
+  
+  const finalUser = await user.unsubscribe(channelId);
+  
+  const finalChannel = await channel.remSubscriber();
+
+  return res.status(200).json(
+    new ApiResponse(200, { user: finalUser, channel: finalChannel }, "Subscribed successfully")
+  );
+});
+
+const likeVideo = asyncHandeller( async (req, res) => {
+  const { userId, videoId } = req.body;
+
+  const user = await User.findById(userId);
+  
+  if (!user) throw new ApiError(400, 'User not found');
+  
+  const video = await Video.findById(videoId);
+  
+  if (!video) throw new ApiError(400, 'Video not found');
+  
+  if (await user.likeVideo(videoId))
+    await video.remDislike();
+
+  const userAfterLike = await User.findById(user._id).select('-password');
+  
+  const finalVideo = await video.addLike();
+
+  return res.status(200).json(
+    new ApiResponse(200, { user: userAfterLike, video: finalVideo })
+  )
+});
+
+const unlikeVideo = asyncHandeller( async (req, res) => {
+  const { userId, videoId } = req.body;
+
+  const user = await User.findById(userId);
+  
+  if (!user) throw new ApiError(400, 'User not found');
+  
+  const video = await Video.findById(videoId);
+  
+  if (!video) throw new ApiError(400, 'Video not found');
+  
+  const finalUser = await user.unlikeVideo(videoId);
+
+  const userAfterLike = await User.findById(finalUser._id).select('-password');
+  
+  const finalVideo = await video.remLike();
+
+  return res.status(200).json(
+    new ApiResponse(200, { user: userAfterLike, video: finalVideo })
+  )
+});
+
+const dislikeVideo = asyncHandeller( async (req, res) => {
+  const { userId, videoId } = req.body;
+
+  const user = await User.findById(userId);
+  
+  if (!user) throw new ApiError(400, 'User not found');
+  
+  const video = await Video.findById(videoId);
+  
+  if (!video) throw new ApiError(400, 'Video not found');
+  
+  if (await user.dislikeVideo(videoId))
+    await video.remLike();
+
+  const userAfterLike = await User.findById(user._id).select('-password');
+  
+  const finalVideo = await video.addDislike();
+
+  return res.status(200).json(
+    new ApiResponse(200, { user: userAfterLike, video: finalVideo })
+  )
+});
+
+const undislikeVideo = asyncHandeller( async (req, res) => {
+  const { userId, videoId } = req.body;
+
+  const user = await User.findById(userId);
+  
+  if (!user) throw new ApiError(400, 'User not found');
+  
+  const video = await Video.findById(videoId);
+  
+  if (!video) throw new ApiError(400, 'Video not found');
+  
+  const finalUser = await user.undislikeVideo(videoId);
+
+  const userAfterLike = await User.findById(finalUser._id).select('-password');
+  console.log(userAfterLike);
+  
+  const finalVideo = await video.remDislike();
+
+  return res.status(200).json(
+    new ApiResponse(200, { user: userAfterLike, video: finalVideo })
+  )
 });
 
 const getChannelVideos = asyncHandeller( async (req, res) => {
@@ -157,8 +290,23 @@ const getVideo = asyncHandeller( async (req, res) => {
 
   if (!fVideo ||!channel) throw new ApiError(400, 'Error in loading video');
 
+  var finalVideo = {};
+  if (fVideo.visiblity === "Public") {
+    finalVideo = {
+      _id: fVideo._id,
+      videoFile: fVideo.videoFile,
+      title: fVideo.title,
+      views: fVideo.views,
+      likes: fVideo.likes,
+      timePassed: timePassed(fVideo.createdAt),
+      duration: calcDuration(Math.round(fVideo.duration)),
+      description: fVideo.descripton,
+      comments: fVideo.comments
+    };
+  }
+
   return res.status(200).json(
-    new ApiResponse(200, { video: fVideo, channel }, 'Success')
+    new ApiResponse(200, { video: finalVideo, channel }, 'Success')
   );
 });
 
@@ -305,14 +453,49 @@ const search = asyncHandeller( async (req, res) => {
   );
 });
 
+const getComments = asyncHandeller( async (req, res) => {
+  const { videoId } = req.params;
+
+  const commentIds = await Video.findById(videoId).select('comments');
+
+  const comments = await Comment.find({ _id: { $in: commentIds.comments } }).sort({ createdAt: -1 });
+
+  const data = [];
+  for (let i = 0; i < comments.length; i++) {
+    const user = await User.findById(comments[i].owner);
+
+    data.push({
+      _id: comments[i]._id,
+      content: comments[i].content,
+      owner: {
+        profileImage: user.profileImage,
+        userName: user.userName
+      },
+      likes: comments[i].likes,
+      timePassed: timePassed(Math.round(comments[i].createdAt))
+    })
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, data)
+  );
+})
+
 module.exports = {
   uploadVideo,
   uploadThumbnail,
   publishVideo,
+  subscribe,
+  unsubscribe,
+  likeVideo,
+  unlikeVideo,
+  dislikeVideo,
+  undislikeVideo,
   getChannelVideos,
   getAllVideos,
   getVideo,
   getSubscriptionVideos,
   getTrendingVideos,
-  search
+  search,
+  getComments
 }

@@ -41,6 +41,12 @@ const videoSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  comments: [
+    {
+      type: mongoose.Types.ObjectId,
+      ref: 'Comment'
+    }
+  ],
   madeForKids: {
     type: Boolean,
     default: false,
@@ -54,6 +60,42 @@ videoSchema.methods.addView = async function () {
   this.views += 1;
   await this.save();
 
+  return this;
+}
+
+videoSchema.methods.addLike = async function () {
+  this.likes += 1;
+  await this.save();
+  return this;
+}
+
+videoSchema.methods.remLike = async function () {
+  this.likes -= 1;
+  await this.save();
+  return this;
+}
+
+videoSchema.methods.addDislike = async function () {
+  this.dislikes += 1;
+  await this.save();
+  return this;
+}
+
+videoSchema.methods.remDislike = async function () {
+  this.dislikes -= 1;
+  await this.save();
+  return this;
+}
+
+videoSchema.methods.addComment = async function (commentId) {
+  this.comments.push(commentId);
+  await this.save();
+  return this;
+}
+
+videoSchema.methods.deleteComment = async function (commentId) {
+  this.comments = this.comments.filter(comment => comment!= commentId);
+  await this.save();
   return this;
 }
 

@@ -103,46 +103,6 @@ const uploadProfileBanner = asyncHandeller( async (req, res) => {
   );
 });
 
-const subscribe = asyncHandeller( async (req, res) => {
-  const { userId, channelId } = req.body;
-
-  const user = await User.findById(userId);
-  
-  if (!user) throw new ApiError(400, 'User not found');
-  
-  const channel = await User.findById(channelId);
-  
-  if (!channel) throw new ApiError(400, 'Channel not found');
-  
-  const finalUser = await user.subscribe(channelId);
-  
-  const finalChannel = await channel.addSubscriber();
-
-  return res.status(200).json(
-    new ApiResponse(200, { user: finalUser, channel: finalChannel }, "Subscribed successfully")
-  );
-});
-
-const unsubscribe = asyncHandeller( async (req, res) => {
-  const { userId, channelId } = req.body;
-
-  const user = await User.findById(userId);
-  
-  if (!user) throw new ApiError(400, 'User not found');
-  
-  const channel = await User.findById(channelId);
-  
-  if (!channel) throw new ApiError(400, 'Channel not found');
-  
-  const finalUser = await user.unsubscribe(channelId);
-  
-  const finalChannel = await channel.remSubscriber();
-
-  return res.status(200).json(
-    new ApiResponse(200, { user: finalUser, channel: finalChannel }, "Subscribed successfully")
-  );
-});
-
 const getUserHistory = asyncHandeller( async (req, res) => {
   const { userId } = req.params;
 
@@ -261,8 +221,6 @@ module.exports = {
   loginUser,
   uploadProfileImage,
   uploadProfileBanner,
-  subscribe,
-  unsubscribe,
   getUserHistory,
   getYouHistory,
   getChannel,

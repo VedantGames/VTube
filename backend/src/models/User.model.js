@@ -53,7 +53,60 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
-  }
+  },
+  likes: {
+    Videos: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Video'
+      }
+    ],
+    Tweets: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Tweet'
+      }
+    ]
+  },
+  dislikes: {
+    Videos: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Video'
+      }
+    ],
+    Tweets: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Tweet'
+      }
+    ]
+  },
+  comments: {
+    Videos: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Comment'
+      }
+    ],
+    Tweets: [
+      {
+        type: mongoose.Types.ObjectId,
+        ref: 'Comment'
+      }
+    ]
+  },
+  playlists: [
+    {
+      name: String,
+      videos: [
+        {
+          type: mongoose.Types.ObjectId,
+          ref: 'Video'
+        }
+      ]
+    }
+  ]
 }, {
   timestamps: true
 });
@@ -106,6 +159,52 @@ userSchema.methods.remSubscriber = async function () {
   this.subscribers -= 1;
   await this.save();
   return this;
+}
+
+userSchema.methods.likeVideo = async function (videoId) {
+  this.likes.Videos.push(videoId);
+  if (this.dislikes.Videos.some(video => video == videoId)) {
+    this.dislikes.Videos = this.dislikes.Videos.filter(video => video != videoId);
+    await this.save();
+    return true;
+  } else {
+    await this.save();
+    return false;
+  }
+}
+
+userSchema.methods.unlikeVideo = async function (videoId) {
+  this.likes.Videos = this.likes.Videos.filter(video => video != videoId);
+  await this.save();
+  return this;
+}
+
+userSchema.methods.dislikeVideo = async function (videoId) {
+  this.dislikes.Videos.push(videoId);
+  if (this.likes.Videos.some(video => video == videoId)) {
+    this.likes.Videos = this.likes.Videos.filter(video => video != videoId);
+    await this.save();
+    return true;
+  } else {
+    await this.save();
+    return false;
+  }
+}
+
+userSchema.methods.undislikeVideo = async function (videoId) {
+  this.dislikes.Videos = this.dislikes.Videos.filter(video => video != videoId);
+  await this.save();
+  return this;
+}
+
+userSchema.methods.commentOnVideo = async function (commentId) {
+  this.comments.Videos.push(commentId);
+  await this.save();
+  return this;
+}
+
+userSchema.methods.deleteCommentOnVideo = async function (commentId) {
+  this.comments.Video = this.comments.Video.filter(comment => comment != commentId);
 }
 
 const User = mongoose.model('User', userSchema);
