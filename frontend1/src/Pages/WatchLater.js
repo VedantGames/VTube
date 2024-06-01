@@ -1,33 +1,33 @@
+import axios from 'axios';
 import React, { useContext, useEffect, useState } from 'react'
 import { User } from '../Contexts/User.Context';
-import axios from 'axios';
+import { Link, useNavigate } from 'react-router-dom';
 import { Image, Transformation } from 'cloudinary-react';
-import { Link, Navigate } from 'react-router-dom';
 
-function HistoryPage() {
+function WatchLaterPage() {
   const { user } = useContext(User);
+  const navigate = useNavigate();
 
-  const [userHistory, setUserHistory] = useState(null);
+  const [videos, setVideos] = useState(null);
 
   useEffect(() => {
-    if (user)
+    if (!user) navigate('/register');
+    else
       axios
-        .get('/users/user-history/' + user._id)
-        .then(({data}) => setUserHistory(data.data))
+        .get('videos/watch-later/' + user._id)
+        .then(({data}) => setVideos(data.data))
         .catch(err => console.log(err));
   }, [user]);
-
-  if (!user) return <Navigate to={'/register'} />
 
   return (
     <div className='2xl:px-48 xl:px-28 lg:px-10 sm:px-20 px-5 lg:pt-5 '>
       <div>
         <h1 className='lg:text-4xl text-xl font-bold'>
-          Watch history
+          Watch Later
         </h1>
       </div>
       <div className='flex flex-col gap-5 2xl:mt-20 lg:mt-10 mt-5 2xl:pr-[20rem] lg:pr-28'>
-        {userHistory && userHistory.map((video, i) => (
+        {videos && videos.map((video, i) => (
           <Link to={'/video/'+video._id} key={i} className='grid sm:grid-cols-[1fr_2fr] w-full'>
             <div className='relative'>
               <Image cloudName='dcpi2varq' publicId={video.thumbnail} >
@@ -47,7 +47,7 @@ function HistoryPage() {
               </div>
               <div className='text-[#AAA] sm:text-xs text-xs'>
                 <div>
-                  {video.channelName} ‧ {video.views} views
+                  {video.channelName} ‧ {video.views} views ‧ {video.timePassed} ago
                 </div>
                 <div className='md:mt-2 md:line-clamp-2 line-clamp-1'>
                   <h1>
@@ -63,4 +63,4 @@ function HistoryPage() {
   )
 }
 
-export default HistoryPage
+export default WatchLaterPage

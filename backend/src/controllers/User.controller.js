@@ -103,6 +103,28 @@ const uploadProfileBanner = asyncHandeller( async (req, res) => {
   );
 });
 
+const addToWatchLater = asyncHandeller( async (req, res) => {
+  const { userId, videoId } = req.body;
+
+  if (videoId === undefined || videoId === '') throw new ApiError(400, 'Video not found');
+
+  var user = await User.findById(userId);
+  
+  if (!user) throw new ApiError(400, 'User not found');
+
+  const watchLaterPlaylist = user.playlists.find(playlist => playlist.name === 'watchLater');
+  
+  if (!watchLaterPlaylist) user = await user.createPlaylist('watchLater');
+
+  const userAfterAdding = user.addVideoToPlaylist('watchLater', videoId);
+
+  const finalUser = await User.findById(userId).select('-password');
+
+  return res.status(200).json(
+    new ApiResponse(200, { user: finalUser })
+  );
+})
+
 const getUserHistory = asyncHandeller( async (req, res) => {
   const { userId } = req.params;
 
@@ -221,6 +243,7 @@ module.exports = {
   loginUser,
   uploadProfileImage,
   uploadProfileBanner,
+  addToWatchLater,
   getUserHistory,
   getYouHistory,
   getChannel,

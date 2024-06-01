@@ -15,10 +15,12 @@ import Subscriptions from './Pages/Subscriptions';
 import TrendingPage from './Pages/Trending';
 import YouPage from './Pages/You';
 import SearchPageMobile from './Pages/SearchPage';
+import WatchLaterPage from './Pages/WatchLater';
+import LikedPage from './Pages/Liked';
 
 const baseURLS = ['https://vtube-server.vercel.app/api/v1', 'http://localhost:8000/api/v1'];
 
-axios.defaults.baseURL = baseURLS[0];
+axios.defaults.baseURL = baseURLS[1];
 axios.defaults.withCredentials = true;
 
 function App() {
@@ -37,6 +39,8 @@ function App() {
           <Route path='/channel/:channelName' element={<ChannelPage />} />
           <Route path='/account' element={<Account />} />
           <Route path='/history' element={<HistoryPage />} />
+          <Route path='/watch-later' element={<WatchLaterPage />} />
+          <Route path='/liked' element={<LikedPage />} />
           <Route path='/trendings' element={<TrendingPage />} />
           <Route path='/you' element={<YouPage />} />
           <Route path='/search-mobile' element={<SearchPageMobile />} />

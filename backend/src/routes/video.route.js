@@ -4,7 +4,8 @@ const { multerUploadVid } = require('../middlewares/multer.middleware');
 const {
   uploadVideo, uploadThumbnail, publishVideo, getChannelVideos, getAllVideos,
   getVideo, search, getSubscriptionVideos, getTrendingVideos, subscribe,
-  unsubscribe, likeVideo, unlikeVideo, dislikeVideo, undislikeVideo, getComments
+  unsubscribe, likeVideo, unlikeVideo, dislikeVideo, undislikeVideo, getComments,
+  getWatchLaterVideos, getLikedVideos
 } = require('../controllers/Video.controller');
 
 const router = Router();
@@ -22,6 +23,8 @@ router.route('/undislike').post(undislikeVideo);
 router.route('/channel-videos/:channelId').get(getChannelVideos);
 router.route('/all-videos').get(getAllVideos);
 router.route('/video/:userId/:videoId').get(getVideo);
+router.route('/watch-later/:userId').get(getWatchLaterVideos);
+router.route('/liked/:userId').get(getLikedVideos);
 router.route('/search/:query').get(search);
 router.route('/subscriptions/:userId').get(getSubscriptionVideos);
 router.route('/trending').get(getTrendingVideos);

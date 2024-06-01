@@ -207,6 +207,30 @@ userSchema.methods.deleteCommentOnVideo = async function (commentId) {
   this.comments.Video = this.comments.Video.filter(comment => comment != commentId);
 }
 
+userSchema.methods.createPlaylist = async function (name) {
+  this.playlists.push({
+    name,
+    videos: []
+  });
+  await this.save();
+  return this;
+}
+
+userSchema.methods.addVideoToPlaylist = async function (playlistName, videoId) {
+  const playlist = this.playlists.find(playlist => playlist.name == playlistName);
+  if (!playlist.videos.find(video => video == videoId))
+    playlist.videos.push(videoId);
+  await this.save();
+  return this;
+}
+
+userSchema.methods.deleteVideoFromPlaylist = async function (playlistName, videoId) {
+  const playlist = this.playlists.find(playlist => playlist.name == playlistName);
+  playlist.videos = playlist.videos.filter(video => video != videoId);
+  await this.save();
+  return this;
+}
+
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;

@@ -256,6 +256,7 @@ const getAllVideos = asyncHandeller( async (req, res) => {
       finalVideos.push({
         _id: videos[i]._id,
         thumbnail: videos[i].thumbnail,
+        videoFile: videos[i].videoFile,
         title: videos[i].title,
         views: videos[i].views,
         timePassed: timePassed(videos[i].createdAt),
@@ -282,6 +283,8 @@ const getVideo = asyncHandeller( async (req, res) => {
 
   if (!video) throw new ApiError(400, 'Video not found');
 
+  const finalUser = await user.deleteVideoFromPlaylist('watchLater', videoId);
+
   // Add video to history using cookies
 
   const fVideo = await video.addView();
@@ -306,7 +309,7 @@ const getVideo = asyncHandeller( async (req, res) => {
   }
 
   return res.status(200).json(
-    new ApiResponse(200, { video: finalVideo, channel }, 'Success')
+    new ApiResponse(200, { video: finalVideo, channel, finalUser }, 'Success')
   );
 });
 
@@ -385,7 +388,93 @@ const getTrendingVideos = asyncHandeller( async (req, res) => {
   return res.status(200).json(
     new ApiResponse(200, finalVideos)
   );
-})
+});
+
+const getWatchLaterVideos = asyncHandeller( async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+
+  if (!user || user === undefined) throw new ApiError(400, 'User not found');
+
+  const list = user.playlists.find(playlist => playlist.name == 'watchLater');
+
+  if (!list) return res.status(200).json(
+    new ApiResponse(200, { videos: [] }, 'No videos in playlist')
+  );
+
+  const videos = await Video.find({ _id: { $in: list.videos } });
+
+  var finalVideos = [];
+  var owner = null;
+  for (let i = 0; i < videos.length; i++) {
+    if (i === 0) videos[i].duration = 560;
+    if (i === 1) videos[i].duration = 459;
+    if (i === 2) videos[i].duration = 1268;
+    if (i === 3) videos[i].duration = 25789;
+    if (i === 4) videos[i].duration = 592;
+    if (i === 5) videos[i].duration = 608;
+    if (i === 6) videos[i].duration = 115;
+    owner = await User.findById(videos[i].owner);
+
+    if (videos[i].visiblity === "Public") {
+      finalVideos.push({
+        _id: videos[i]._id,
+        thumbnail: videos[i].thumbnail,
+        title: videos[i].title,
+        views: videos[i].views,
+        timePassed: timePassed(videos[i].createdAt),
+        duration: calcDuration(Math.round(videos[i].duration)),
+        channelName: owner.fullName,
+        description: videos[i].descripton
+      });
+    }
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, finalVideos)
+  );
+});
+
+const getLikedVideos = asyncHandeller( async (req, res) => {
+  const { userId } = req.params;
+
+  const user = await User.findById(userId);
+
+  if (!user || user === undefined) throw new ApiError(400, 'User not found');
+
+  const videos = await Video.find({ _id: { $in: user.likes.Videos } });
+
+  var finalVideos = [];
+  var owner = null;
+  for (let i = 0; i < videos.length; i++) {
+    if (i === 0) videos[i].duration = 560;
+    if (i === 1) videos[i].duration = 459;
+    if (i === 2) videos[i].duration = 1268;
+    if (i === 3) videos[i].duration = 25789;
+    if (i === 4) videos[i].duration = 592;
+    if (i === 5) videos[i].duration = 608;
+    if (i === 6) videos[i].duration = 115;
+    owner = await User.findById(videos[i].owner);
+
+    if (videos[i].visiblity === "Public") {
+      finalVideos.push({
+        _id: videos[i]._id,
+        thumbnail: videos[i].thumbnail,
+        title: videos[i].title,
+        views: videos[i].views,
+        timePassed: timePassed(videos[i].createdAt),
+        duration: calcDuration(Math.round(videos[i].duration)),
+        channelName: owner.fullName,
+        description: videos[i].descripton
+      });
+    }
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, finalVideos)
+  );
+});
 
 const search = asyncHandeller( async (req, res) => {
   const { query } = req.params;
@@ -496,6 +585,8 @@ module.exports = {
   getVideo,
   getSubscriptionVideos,
   getTrendingVideos,
+  getWatchLaterVideos,
+  getLikedVideos,
   search,
   getComments
 }
