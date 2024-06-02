@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Image, Transformation, Video } from 'cloudinary-react';
 import React, { useContext, useEffect, useState } from 'react'
-import { Navigate, useNavigate, useParams } from 'react-router-dom'
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { User } from '../Contexts/User.Context';
 
 function VideoPage({ showSidePanel, setShowSidePanel }) {
@@ -13,6 +13,8 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
 
   const [video, setVideo] = useState(null);
   const [channel, setChannel] = useState(null);
+
+  const [recommendations, setRecommendations] = useState(null);
 
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState('');
@@ -29,6 +31,10 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
         setVideo(data.data.video);
         setChannel(data.data.channel);
       })
+      .catch(err => console.log(err));
+    axios
+      .get('videos/all-videos')
+      .then(({data}) => setRecommendations(data.data))
       .catch(err => console.log(err));
     }, [videoId]);
     
@@ -119,21 +125,21 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
   };
 
   return (
-    <div className='h-full min-h-[93.3vh] px-20 pt-5 text-[#f1f1f1] font-[arial]'>
+    <div className='h-full min-h-[93.3vh] w-full md:px-20 px-7 pt-5 text-[#f1f1f1] font-[arial]'>
       {(video && channel) && (
-        <div className='flex'>
-          <div>
+        <div className='flex lg:flex-row lg:gap-0 flex-col gap-10'>
+          <div className='w-full'>
             <div>
               <Video cloudName='dcpi2varq' publicId={video.videoFile} controls='true' className='rounded-xl'>
               </Video>
             </div>
             <div className='mt-2'>
-              <h1 className='text-xl font-bold'>
+              <h1 className='sm:text-xl font-bold'>
                 {video.title}
               </h1>
             </div>
-            <div className='mt-2'>
-              <div className='flex justify-between'>
+            <div className='md:mt-2 mt-4'>
+              <div className='flex justify-between md:flex-row flex-col md:gap-0 gap-3'>
                 <div className='flex gap-3'>
                   <div className='size-10'>
                     {channel.profileImage !== '' ? (
@@ -148,7 +154,7 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
                   </div>
                   <div>
                     <div>
-                      <h1 className='font-bold'>
+                      <h1 className='font-bold sm:text-base text-sm'>
                         {channel.fullName} 
                       </h1>
                     </div>
@@ -158,20 +164,20 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
                       </h2>
                     </div>
                   </div>
-                  <div className='ml-3'>
+                  <div className='sm:ml-3'>
                     {(user && user.subscriptions.some(subscription => subscription == channel._id)) ? (
-                      <button className='bg-[#272727] hover:bg-[#333] text-[#f1f1f1] font-semibold text-sm w-full h-full max-h-9 min-w-24 rounded-full' onClick={unsubscribe}>
+                      <button className='bg-[#272727] hover:bg-[#333] text-[#f1f1f1] font-semibold sm:text-sm text-xs p-2 rounded-full' onClick={unsubscribe}>
                         Subscribed
                       </button>
                     ) : (
-                      <button className='bg-[#f1f1f1] hover:bg-[#ddd] text-[#0f0f0f] font-semibold text-sm w-full h-full max-h-9 min-w-24 rounded-full' onClick={subscribe}>
+                      <button className='bg-[#f1f1f1] hover:bg-[#ddd] text-[#0f0f0f] font-semibold sm:text-sm text-xs p-2 rounded-full' onClick={subscribe}>
                         Subscribe
                       </button>
                     )}
                   </div>
                 </div>
-                <div className='flex gap-2 h-9'>
-                  <div className='flex items-center bg-[#272727] h-9 w-full min-w-[9rem] rounded-full'>
+                <div className='flex justify-between gap-2 h-9'>
+                  <div className='flex items-center bg-[#272727] h-9 w-full min-w-36 max-w-36 rounded-full'>
                     <button className='flex items-center bg-[#272727] hover:bg-[#3f3f3f] rounded-s-full min-w-[5.5rem] w-full h-9' onClick={(!videoLiked ? like : unlike)}>
                       <div className='ml-4'>
                         {videoLiked ? (
@@ -205,30 +211,32 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
                       </div>
                     </button>
                   </div>
-                  <button className='flex items-center bg-[#272727] hover:bg-[#3f3f3f] rounded-full px-5'>
-                    <div>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                      </svg>
-                    </div>
-                    <div className='ml-1'>
-                      <h1 className='font-semibold text-sm'>
-                        Share
-                      </h1>
-                    </div>
-                  </button>
-                  <button className='flex items-center bg-[#272727] hover:bg-[#3f3f3f] rounded-full px-5'>
-                    <div>
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <div className='ml-1'>
-                      <h1 className='font-semibold text-sm'>
-                        Download
-                      </h1>
-                    </div>
-                  </button>
+                  <div className='flex gap-2'>
+                    <button className='flex items-center bg-[#272727] hover:bg-[#3f3f3f] rounded-full px-5'>
+                      <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                        </svg>
+                      </div>
+                      <div className='ml-1'>
+                        <h1 className='font-semibold text-sm'>
+                          Share
+                        </h1>
+                      </div>
+                    </button>
+                    <button className='flex items-center bg-[#272727] hover:bg-[#3f3f3f] rounded-full px-5'>
+                      <div>
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className='ml-1'>
+                        <h1 className='font-semibold text-sm'>
+                          Download
+                        </h1>
+                      </div>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -239,7 +247,7 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
                   </h1>
                 </div>
                 <div className='flex'>
-                  <h1 className={'mt-2 max-w-[73rem] font-medium text-sm ' + (showDescription ? 'line-clamp-2' : '')}>
+                  <h1 className={'mt-2 max-w-[73rem] font-medium text-sm ' + (!showDescription ? 'line-clamp-2' : '')}>
                     {video.description}
                   </h1>
                   <div className='flex items-end'>
@@ -330,8 +338,38 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
               </div>
             </div>
           </div>
-          <div className='w-full max-w-[27.5rem]'>
-
+          <div className='flex flex-col gap-6 w-full lg:max-w-[27.5rem] justify-center sm:pl-10'>
+            {recommendations && recommendations.map((video, i) => (
+              <Link to={'/video/'+video._id} key={i} className='lg:grid xl:grid-cols-[1.4fr_2fr] w-full flex flex-col justify-center'>
+                <div className='relative flex flex-col'>
+                  <Image cloudName='dcpi2varq' publicId={video.thumbnail} >
+                    <Transformation crop='scale' radius='10' height='300' width='530' />
+                  </Image>
+                  <div className='absolute z-10 flex justify-center items-center md:text-base text-xs bg-black opacity-60 px-1.5 bottom-1 right-2 rounded-md'>
+                    <h1 className='opacity-100'>
+                      {video.duration}
+                    </h1>
+                  </div>
+                </div>
+                <div className='sm:ml-4 ml-1 sm:mt-0 mt-1'>
+                  <div>
+                    <h1 className='lg:text md:text-base sm:text-sm text-lg font-semibold line-clamp-2'>
+                      {video.title}
+                    </h1>
+                  </div>
+                  <div className='text-[#AAA] sm:text-xs text-xs'>
+                    <div>
+                      {video.channelName} ‧ {video.views} views ‧ {video.timePassed} ago
+                    </div>
+                    <div className='md:mt-2 md:line-clamp-2 line-clamp-1'>
+                      <h1>
+                        {video.description}
+                      </h1>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       )}
