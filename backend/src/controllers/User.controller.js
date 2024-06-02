@@ -132,36 +132,35 @@ const getUserHistory = asyncHandeller( async (req, res) => {
   
   if (!user) throw new ApiError(400, 'User not found');
 
-  const userHistory = await user.watchHistory;
+  const userHistory = user.watchHistory;
 
-  var videos = [];
-  var video = null;
-  var owner = null;
-  var duration = 0;
-  for (let i = userHistory.length - 1; i >= 0; i--) {
-    video = await Video.findById(userHistory[i]);
-    owner = await User.findById(video.owner);
-    if (i === userHistory.length - 0) duration = 560;
-    if (i === userHistory.length - 1) duration = 459;
-    if (i === userHistory.length - 2) duration = 1268;
-    if (i === userHistory.length - 3) duration = 25789;
-    if (i === userHistory.length - 4) duration = 592;
-    if (i === userHistory.length - 5) duration = 608;
-    if (i === userHistory.length - 6) duration = 115;
+  const videos = await Video.find({ _id: { $in: userHistory } });
+  var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
+  owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
+
+  var finalVideos = [];
+  for (let i = videos.length - 1; i >= 0; i--) {
+    if (i === videos.length - 0) videos[i].duration = 560;
+    if (i === videos.length - 1) videos[i].duration = 459;
+    if (i === videos.length - 2) videos[i].duration = 1268;
+    if (i === videos.length - 3) videos[i].duration = 25789;
+    if (i === videos.length - 4) videos[i].duration = 592;
+    if (i === videos.length - 5) videos[i].duration = 608;
+    if (i === videos.length - 6) videos[i].duration = 115;
     
-    videos.push({
-      _id: video._id,
-      thumbnail: video.thumbnail,
-      title: video.title,
-      views: video.views,
-      duration: calcDuration(duration),
-      channelName: owner.fullName,
-      description: video.descripton
+    finalVideos.push({
+      _id: videos[i]._id,
+      thumbnail: videos[i].thumbnail,
+      title: videos[i].title,
+      views: videos[i].views,
+      duration: calcDuration(videos[i].duration),
+      channelName: owners[i].fullName,
+      description: videos[i].descripton
     });
   }
 
   return res.status(200).json(
-    new ApiResponse(200, videos, 'User history')
+    new ApiResponse(200, finalVideos, 'User history')
   );
 });
 
@@ -172,36 +171,35 @@ const getYouHistory = asyncHandeller( async (req, res) => {
   
   if (!user) throw new ApiError(400, 'User not found');
 
-  const userHistory = await user.watchHistory.slice(-16);
+  const userHistory = user.watchHistory.slice(-16);
 
-  var videos = [];
-  var video = null;
-  var owner = null;
-  var duration = 0;
-  for (let i = userHistory.length - 1; i >= 0; i--) {
-    video = await Video.findById(userHistory[i]);
-    owner = await User.findById(video.owner);
-    if (i === userHistory.length - 0) duration = 560;
-    if (i === userHistory.length - 1) duration = 459;
-    if (i === userHistory.length - 2) duration = 1268;
-    if (i === userHistory.length - 3) duration = 25789;
-    if (i === userHistory.length - 4) duration = 592;
-    if (i === userHistory.length - 5) duration = 608;
-    if (i === userHistory.length - 6) duration = 115;
+  const videos = await Video.find({ _id: { $in: userHistory } });
+  var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
+  owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
+
+  var finalVideos = [];
+  for (let i = videos.length - 1; i >= 0; i--) {
+    if (i === videos.length - 0) videos[i].duration = 560;
+    if (i === videos.length - 1) videos[i].duration = 459;
+    if (i === videos.length - 2) videos[i].duration = 1268;
+    if (i === videos.length - 3) videos[i].duration = 25789;
+    if (i === videos.length - 4) videos[i].duration = 592;
+    if (i === videos.length - 5) videos[i].duration = 608;
+    if (i === videos.length - 6) videos[i].duration = 115;
     
-    videos.push({
-      _id: video._id,
-      thumbnail: video.thumbnail,
-      title: video.title,
-      views: video.views,
-      duration: calcDuration(duration),
-      channelName: owner.fullName,
-      description: video.descripton
+    finalVideos.push({
+      _id: videos[i]._id,
+      thumbnail: videos[i].thumbnail,
+      title: videos[i].title,
+      views: videos[i].views,
+      duration: calcDuration(videos[i].duration),
+      channelName: owners[i].fullName,
+      description: videos[i].descripton
     });
   }
 
   return res.status(200).json(
-    new ApiResponse(200, videos, 'User history')
+    new ApiResponse(200, finalVideos, 'User history')
   );
 });
 

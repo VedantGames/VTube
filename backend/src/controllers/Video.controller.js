@@ -195,7 +195,6 @@ const undislikeVideo = asyncHandeller( async (req, res) => {
   const finalUser = await user.undislikeVideo(videoId);
 
   const userAfterLike = await User.findById(finalUser._id).select('-password');
-  console.log(userAfterLike);
   
   const finalVideo = await video.remDislike();
 
@@ -213,24 +212,23 @@ const getChannelVideos = asyncHandeller( async (req, res) => {
 
   const videosIDs = user.videos;
 
-  const videos = [];
-  var video = null;
+  const finalVideos = [];
+  var videos = await Video.find({ _id: { $in: videosIDs } });
   
   for (let i = videosIDs.length - 1; i >= 0; i--) {
-    video = await Video.findById(videosIDs[i]);
-    if (video.visiblity === 'Public')
-      videos.push({
-        _id: video._id,
-        thumbnail: video.thumbnail,
-        title: video.title,
-        views: video.views,
-        timePassed: timePassed(video.createdAt),
-        duration: calcDuration(Math.round(video.duration))
+    if (videos[i].visiblity === 'Public')
+      finalVideos.push({
+        _id: videos[i]._id,
+        thumbnail: videos[i].thumbnail,
+        title: videos[i].title,
+        views: videos[i].views,
+        timePassed: timePassed(videos[i].createdAt),
+        duration: calcDuration(Math.round(videos[i].duration))
       });
   }
 
   return res.status(200).json(
-    new ApiResponse(200, videos, 'Videos loaded successfully')
+    new ApiResponse(200, finalVideos, 'Videos loaded successfully')
   );
 });
 
@@ -238,8 +236,11 @@ const getAllVideos = asyncHandeller( async (req, res) => {
   const videos = await Video.find().sort({createdAt: -1}).limit(20);
 
   if (videos.length === 0) throw new ApiError(400, 'No videos found');
-
-
+  
+  var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
+  
+  owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
+  
   var finalVideos = [];
   var owner = null;
   for (let i = 0; i < videos.length; i++) {
@@ -250,7 +251,6 @@ const getAllVideos = asyncHandeller( async (req, res) => {
     if (i === 4) videos[i].duration = 592;
     if (i === 5) videos[i].duration = 608;
     if (i === 6) videos[i].duration = 115;
-    owner = await User.findById(videos[i].owner);
 
     if (videos[i].visiblity === "Public") {
       finalVideos.push({
@@ -261,8 +261,8 @@ const getAllVideos = asyncHandeller( async (req, res) => {
         views: videos[i].views,
         timePassed: timePassed(videos[i].createdAt),
         duration: calcDuration(Math.round(videos[i].duration)),
-        channelImg: owner.profileImage,
-        channelName: owner.fullName
+        channelImg: owners[i].profileImage,
+        channelName: owners[i].fullName
       });
     }
   }
@@ -323,8 +323,11 @@ const getSubscriptionVideos = asyncHandeller( async (req, res) => {
   const videos = await Video.find({ owner: { $in: userSubscriptions.subscriptions } }).sort({ createdAt: -1 }).limit(20);
   videos.sort((a, b) => b.views - a.views);
   
+  var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
+  
+  owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
+  
   var finalVideos = [];
-  var owner = null;
   for (let i = 0; i < videos.length; i++) {
     if (i === 0) videos[i].duration = 560;
     if (i === 1) videos[i].duration = 459;
@@ -333,7 +336,6 @@ const getSubscriptionVideos = asyncHandeller( async (req, res) => {
     if (i === 4) videos[i].duration = 592;
     if (i === 5) videos[i].duration = 608;
     if (i === 6) videos[i].duration = 115;
-    owner = await User.findById(videos[i].owner);
 
     if (videos[i].visiblity === "Public") {
       finalVideos.push({
@@ -343,8 +345,8 @@ const getSubscriptionVideos = asyncHandeller( async (req, res) => {
         views: videos[i].views,
         timePassed: timePassed(videos[i].createdAt),
         duration: calcDuration(Math.round(videos[i].duration)),
-        channelImg: owner.profileImage,
-        channelName: owner.fullName
+        channelImg: owners[i].profileImage,
+        channelName: owners[i].fullName
       });
     }
   }
@@ -358,9 +360,12 @@ const getTrendingVideos = asyncHandeller( async (req, res) => {
   const videos = await Video.find().sort({ createdAt: -1 }).limit(20);
 
   videos.sort((a, b) => b.views - a.views);
+  
+  var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
+  
+  owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
 
   var finalVideos = [];
-  var owner = null;
   for (let i = 0; i < videos.length; i++) {
     if (i === 0) videos[i].duration = 560;
     if (i === 1) videos[i].duration = 459;
@@ -369,7 +374,6 @@ const getTrendingVideos = asyncHandeller( async (req, res) => {
     if (i === 4) videos[i].duration = 592;
     if (i === 5) videos[i].duration = 608;
     if (i === 6) videos[i].duration = 115;
-    owner = await User.findById(videos[i].owner);
 
     if (videos[i].visiblity === "Public") {
       finalVideos.push({
@@ -379,7 +383,7 @@ const getTrendingVideos = asyncHandeller( async (req, res) => {
         views: videos[i].views,
         timePassed: timePassed(videos[i].createdAt),
         duration: calcDuration(Math.round(videos[i].duration)),
-        channelName: owner.fullName,
+        channelName: owners[i].fullName,
         description: videos[i].descripton
       });
     }
@@ -404,9 +408,11 @@ const getWatchLaterVideos = asyncHandeller( async (req, res) => {
   );
 
   const videos = await Video.find({ _id: { $in: list.videos } });
+  var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
+  
+  owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
 
   var finalVideos = [];
-  var owner = null;
   for (let i = 0; i < videos.length; i++) {
     if (i === 0) videos[i].duration = 560;
     if (i === 1) videos[i].duration = 459;
@@ -415,7 +421,6 @@ const getWatchLaterVideos = asyncHandeller( async (req, res) => {
     if (i === 4) videos[i].duration = 592;
     if (i === 5) videos[i].duration = 608;
     if (i === 6) videos[i].duration = 115;
-    owner = await User.findById(videos[i].owner);
 
     if (videos[i].visiblity === "Public") {
       finalVideos.push({
@@ -425,7 +430,7 @@ const getWatchLaterVideos = asyncHandeller( async (req, res) => {
         views: videos[i].views,
         timePassed: timePassed(videos[i].createdAt),
         duration: calcDuration(Math.round(videos[i].duration)),
-        channelName: owner.fullName,
+        channelName: owners[i].fullName,
         description: videos[i].descripton
       });
     }
@@ -444,9 +449,11 @@ const getLikedVideos = asyncHandeller( async (req, res) => {
   if (!user || user === undefined) throw new ApiError(400, 'User not found');
 
   const videos = await Video.find({ _id: { $in: user.likes.Videos } });
+  var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
+  
+  owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
 
   var finalVideos = [];
-  var owner = null;
   for (let i = 0; i < videos.length; i++) {
     if (i === 0) videos[i].duration = 560;
     if (i === 1) videos[i].duration = 459;
@@ -455,7 +462,6 @@ const getLikedVideos = asyncHandeller( async (req, res) => {
     if (i === 4) videos[i].duration = 592;
     if (i === 5) videos[i].duration = 608;
     if (i === 6) videos[i].duration = 115;
-    owner = await User.findById(videos[i].owner);
 
     if (videos[i].visiblity === "Public") {
       finalVideos.push({
@@ -465,7 +471,7 @@ const getLikedVideos = asyncHandeller( async (req, res) => {
         views: videos[i].views,
         timePassed: timePassed(videos[i].createdAt),
         duration: calcDuration(Math.round(videos[i].duration)),
-        channelName: owner.fullName,
+        channelName: owners[i].fullName,
         description: videos[i].descripton
       });
     }
@@ -501,7 +507,9 @@ const search = asyncHandeller( async (req, res) => {
     ]
   }).sort({ subscribers: 1 }).limit(10);
 
-  var channel = null;
+  var channels4V = await User.find({ _id: { $in: videos.map(video => video.owner) } });
+  
+  channels4V = videos.map(video => channels4V.find(owner => owner._id.equals(video.owner)));
   var finalVideos = [];
   for (let i = 0; i < videos.length; i++) {
     if (i === 0) videos[i].duration = 560;
@@ -511,7 +519,6 @@ const search = asyncHandeller( async (req, res) => {
     if (i === 4) videos[i].duration = 592;
     if (i === 5) videos[i].duration = 608;
     if (i === 6) videos[i].duration = 115;
-    channel = await User.findById(videos[i].owner);
 
     finalVideos.push({
       _id: videos[i]._id,
@@ -521,8 +528,8 @@ const search = asyncHandeller( async (req, res) => {
       description: videos[i].descripton,
       timePassed: timePassed(videos[i].createdAt),
       duration: calcDuration(Math.round(videos[i].duration)),
-      channelImg: channel.profileImage,
-      channelName: channel.fullName
+      channelImg: channels4V.profileImage,
+      channelName: channels4V.fullName
     })
   }
 
