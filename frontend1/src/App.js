@@ -20,7 +20,7 @@ import LikedPage from './Pages/Liked';
 
 const baseURLS = ['https://vtube-server.vercel.app/api/v1', 'http://localhost:8000/api/v1'];
 
-axios.defaults.baseURL = baseURLS[1];
+axios.defaults.baseURL = baseURLS[0];
 axios.defaults.withCredentials = true;
 
 function App() {
