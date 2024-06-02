@@ -129,7 +129,19 @@ const likeVideo = asyncHandeller( async (req, res) => {
 
   const userAfterLike = await User.findById(user._id).select('-password');
   
-  const finalVideo = await video.addLike();
+  const fVideo = await video.addLike();
+
+  const finalVideo = {
+    _id: fVideo._id,
+    videoFile: fVideo.videoFile,
+    title: fVideo.title,
+    views: fVideo.views,
+    likes: fVideo.likes,
+    timePassed: timePassed(fVideo.createdAt),
+    duration: calcDuration(Math.round(fVideo.duration)),
+    description: fVideo.descripton,
+    comments: fVideo.comments
+  };
 
   return res.status(200).json(
     new ApiResponse(200, { user: userAfterLike, video: finalVideo })
@@ -151,7 +163,19 @@ const unlikeVideo = asyncHandeller( async (req, res) => {
 
   const userAfterLike = await User.findById(finalUser._id).select('-password');
   
-  const finalVideo = await video.remLike();
+  const fVideo = await video.remLike();
+
+  finalVideo = {
+    _id: fVideo._id,
+    videoFile: fVideo.videoFile,
+    title: fVideo.title,
+    views: fVideo.views,
+    likes: fVideo.likes,
+    timePassed: timePassed(fVideo.createdAt),
+    duration: calcDuration(Math.round(fVideo.duration)),
+    description: fVideo.descripton,
+    comments: fVideo.comments
+  };
 
   return res.status(200).json(
     new ApiResponse(200, { user: userAfterLike, video: finalVideo })
@@ -174,7 +198,19 @@ const dislikeVideo = asyncHandeller( async (req, res) => {
 
   const userAfterLike = await User.findById(user._id).select('-password');
   
-  const finalVideo = await video.addDislike();
+  const fVideo = await video.addDislike();
+
+  finalVideo = {
+      _id: fVideo._id,
+      videoFile: fVideo.videoFile,
+      title: fVideo.title,
+      views: fVideo.views,
+      likes: fVideo.likes,
+      timePassed: timePassed(fVideo.createdAt),
+      duration: calcDuration(Math.round(fVideo.duration)),
+      description: fVideo.descripton,
+      comments: fVideo.comments
+    };
 
   return res.status(200).json(
     new ApiResponse(200, { user: userAfterLike, video: finalVideo })
@@ -196,7 +232,19 @@ const undislikeVideo = asyncHandeller( async (req, res) => {
 
   const userAfterLike = await User.findById(finalUser._id).select('-password');
   
-  const finalVideo = await video.remDislike();
+  const fVideo = await video.remDislike();
+
+  finalVideo = {
+      _id: fVideo._id,
+      videoFile: fVideo.videoFile,
+      title: fVideo.title,
+      views: fVideo.views,
+      likes: fVideo.likes,
+      timePassed: timePassed(fVideo.createdAt),
+      duration: calcDuration(Math.round(fVideo.duration)),
+      description: fVideo.descripton,
+      comments: fVideo.comments
+    };
 
   return res.status(200).json(
     new ApiResponse(200, { user: userAfterLike, video: finalVideo })
@@ -283,7 +331,7 @@ const getVideo = asyncHandeller( async (req, res) => {
 
   if (!video) throw new ApiError(400, 'Video not found');
 
-  const finalUser = await user.deleteVideoFromPlaylist('watchLater', videoId);
+  const finalUser = await user.deleteVideoFromPlaylist('Watch Later', videoId);
 
   // Add video to history using cookies
 
@@ -401,7 +449,7 @@ const getWatchLaterVideos = asyncHandeller( async (req, res) => {
 
   if (!user || user === undefined) throw new ApiError(400, 'User not found');
 
-  const list = user.playlists.find(playlist => playlist.name == 'watchLater');
+  const list = user.playlists.find(playlist => playlist.name == 'Watch Later');
 
   if (!list) return res.status(200).json(
     new ApiResponse(200, { videos: [] }, 'No videos in playlist')
@@ -575,7 +623,34 @@ const getComments = asyncHandeller( async (req, res) => {
   return res.status(200).json(
     new ApiResponse(200, data)
   );
-})
+});
+
+const getAllPlaylists = asyncHandeller( async (req, res) => {
+  const { userId } = req.params;
+
+  if (userId === undefined || userId === null) throw new ApiError(400, "User is required");
+
+  const user = await User.findById(userId);
+
+  if (!user || user === undefined) throw new ApiError(400, 'User not found');
+
+  var playlists = user.playlists;
+
+  var thumbnails = await Video.find({ _id: { $in: playlists.map(playlist => playlist.videos[0] )} }).select('thumbnail');
+
+  playlists = playlists.map(playlist => {
+    return {
+      name: playlist.name,
+      videos: playlist.videos,
+      _id: playlist._id,
+      thumbnail: thumbnails.find(thumbnail => thumbnail._id.equals(playlist.videos[0]._id)).thumbnail
+    }
+  });
+
+  return res.status(200).json(
+    new ApiResponse(200, playlists)
+  );
+});
 
 module.exports = {
   uploadVideo,
@@ -595,5 +670,6 @@ module.exports = {
   getWatchLaterVideos,
   getLikedVideos,
   search,
-  getComments
+  getComments,
+  getAllPlaylists
 }

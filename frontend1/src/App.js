@@ -17,6 +17,7 @@ import YouPage from './Pages/You';
 import SearchPageMobile from './Pages/SearchPage';
 import WatchLaterPage from './Pages/WatchLater';
 import LikedPage from './Pages/Liked';
+import PlaylistsPage from './Pages/Playlists';
 
 const baseURLS = ['https://vtube-server.vercel.app/api/v1', 'http://localhost:8000/api/v1'];
 
@@ -40,6 +41,7 @@ function App() {
           <Route path='/account' element={<Account />} />
           <Route path='/history' element={<HistoryPage />} />
           <Route path='/watch-later' element={<WatchLaterPage />} />
+          <Route path='/playlists' element={<PlaylistsPage />} />
           <Route path='/liked' element={<LikedPage />} />
           <Route path='/trendings' element={<TrendingPage />} />
           <Route path='/you' element={<YouPage />} />

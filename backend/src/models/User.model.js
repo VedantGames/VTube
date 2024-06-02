@@ -217,7 +217,7 @@ userSchema.methods.createPlaylist = async function (name) {
 }
 
 userSchema.methods.addVideoToPlaylist = async function (playlistName, videoId) {
-  const playlist = this.playlists.find(playlist => playlist.name == playlistName);
+  const playlist = this.playlists.find(playlist => playlist.name == playlistName) || this.playlists.find(playlist => playlist._id == playlistName);
   if (!playlist.videos.find(video => video == videoId))
     playlist.videos.push(videoId);
   await this.save();
@@ -225,7 +225,7 @@ userSchema.methods.addVideoToPlaylist = async function (playlistName, videoId) {
 }
 
 userSchema.methods.deleteVideoFromPlaylist = async function (playlistName, videoId) {
-  const playlist = this.playlists.find(playlist => playlist.name == playlistName);
+  const playlist = this.playlists.find(playlist => playlist.name == playlistName) || this.playlists.find(playlist => playlist._id == playlistName);
   playlist.videos = playlist.videos.filter(video => video != videoId);
   await this.save();
   return this;

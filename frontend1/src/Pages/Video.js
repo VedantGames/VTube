@@ -338,7 +338,7 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
               </div>
             </div>
           </div>
-          <div className='flex flex-col gap-6 w-full lg:max-w-[27.5rem] justify-center sm:pl-10'>
+          <div className='flex flex-col md:gap-3 gap-6 w-full lg:max-w-[27.5rem] md:justify-start justify-center sm:pl-10'>
             {recommendations && recommendations.map((video, i) => (
               <Link to={'/video/'+video._id} key={i} className='lg:grid xl:grid-cols-[1.4fr_2fr] w-full flex flex-col justify-center'>
                 <div className='relative flex flex-col'>

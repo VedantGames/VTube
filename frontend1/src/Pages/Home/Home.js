@@ -17,6 +17,11 @@ function Home({ showSidePanel, setShowSidePanel }) {
   const [timeouts, setTimeouts] = useState(null);
   const [canCancel, setCanCancel] = useState(false);
 
+  const [showAddToPlaylistMenu, setShowAddToPlaylistMenu] = useState(false);
+  const [playlists, setPlaylists] = useState(null);
+  const [selectedPlaylists, setSelectedPlaylists] = useState([]);
+  const [selectedVid, setSelectedVid] = useState(-1);
+
   setShowSidePanel(true);
 
   useEffect(() => {
@@ -38,17 +43,17 @@ function Home({ showSidePanel, setShowSidePanel }) {
     ev.preventDefault();
     ev.stopPropagation();
     setTimeout(() => setShowMnu(false), 100)
-  }
-
+  };
+    
   const handelHover = id => {
+    setCanCancel(false);
     clearTimeout(timeouts);
 
     if (!showMnu)
       setTimeouts(setTimeout(() => {
         if (!canCancel)
           setHoveredVideo(id)
-        setCanCancel(false);
-      }, 600))
+      }, 1000))
   }
 
   const addToWatchLater = id => {
@@ -77,7 +82,52 @@ function Home({ showSidePanel, setShowSidePanel }) {
           theme: "dark",
         }
       )
+  };
+
+  const openSaveToPlaylist = id => {
+    if (user === null) navigate('/register');
+    else
+      axios
+        .get('/videos/all-playlists/' + user._id)
+        .then(({data}) => {
+          setPlaylists(data.data)
+          setShowAddToPlaylistMenu(true);
+          setSelectedVid(id);
+        })
+        .catch(err => console.log(err));
   }
+
+  const selectPlaylist = (plInd) => {
+    if (selectedPlaylists.length > 0) {
+      if ((selectedPlaylists && selectedPlaylists.find(p => p == plInd)) !== 0) {
+        delFromPlaylist(plInd, selectedVid);
+        setSelectedPlaylists(selectedPlaylists.filter(p => p != plInd));
+      }
+      else {
+        saveToPlaylist(plInd, selectedVid);
+        setSelectedPlaylists(...selectedPlaylists, plInd);
+      }
+    }
+    else {
+      saveToPlaylist(plInd, selectedVid);
+      setSelectedPlaylists([plInd]);
+    }
+  }
+
+  const saveToPlaylist = (playlistInd, videoInd) => {
+    console.log(playlists, playlistInd, videos, videoInd)
+    axios
+      .post('/users/add-to-playlist', { userId: user._id, playlistId: playlists[playlistInd]._id, videoId: videos[videoInd]._id })
+      .then(({data}) => setUser(data.data))
+      .catch(err => console.log(err));
+    };
+    
+  const delFromPlaylist = (playlistInd, videoInd) => {
+      axios
+        .post('/users/del-from-playlist', { userId: user._id, playlistId: playlists[playlistInd]._id, videoId: videos[videoInd]._id })
+        .then(({data}) => setUser(data.data))
+        .catch(err => console.log(err));
+    };
 
   return (
     <div className='allVideosContainer'>
@@ -101,7 +151,7 @@ function Home({ showSidePanel, setShowSidePanel }) {
               </div>
             </div>
           </div>
-          <div className="flex sm:gap-4 gap-2 mt-3">
+          <div className="flex sm:gap-4 gap-2 mt-3 w-full">
             <Link to={'/channel/'+video.channelName} className="md:min-w-10 md:max-w-10 md:min-h-10 md:max-h-10 min-w-8 max-w-8 min-h-8 max-h-8">
               {video.channelImg !== '' ? (
                 <Image to={'/channel/'+video.channelName} cloudName='dcpi2varq' publicId={video.channelImg} className='rounded-full'>
@@ -113,8 +163,8 @@ function Home({ showSidePanel, setShowSidePanel }) {
                 </svg>
               )}
             </Link>
-            <div className='font-[arial] flex relative'>
-              <div>
+            <div className='font-[arial] flex relative w-full'>
+              <div className='w-full'>
                 <h1 className='title font-semibold text-gray-100 max-h-12 lg:text-base sm:text-sm text-[0.7rem] line-clamp-3'>
                   {video.title}
                 </h1>
@@ -135,25 +185,70 @@ function Home({ showSidePanel, setShowSidePanel }) {
                     </svg>
                     <button>Save to Watch Later</button>
                   </div>
-                  <div className='flex gap-1 bg-[#282828] hover:bg-[#444] w-full pl-3 py-1'>
+                  <div className='flex gap-1 bg-[#282828] hover:bg-[#444] w-full pl-3 py-1' onClick={() => openSaveToPlaylist(i)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
                     </svg>
                     <button>Save to playlist</button>
                   </div>
                 </div>
-                <button onClick={showMenu}>
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
-                  </svg>
-                </button>
+                <div className='flex justify-end w-full'>
+                  <button onClick={showMenu}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
-      <ToastContainer />
-
           </div>
+          <ToastContainer />
         </Link>
       ))}
+      <div className={'absolute flex justify-center items-center top-0 left-0 h-full w-full font-[arial] ' + (!showAddToPlaylistMenu && 'hidden')}>
+        <div className='bg-[#212121] text-[#f1f1f1] px-6 py-4 rounded-2xl'>
+          <div className='flex justify-between mb-4'>
+            <div>
+              <h1 className='font-semibold'>
+                Save video to...
+              </h1>
+            </div>
+            <div className='cursor-pointer' onClick={() => setShowAddToPlaylistMenu(false)}>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </div>
+          </div>
+          <div className='flex flex-col gap-4'>
+            {playlists && playlists.map((playlist, id) => (
+              <div className='flex gap-2 p-0.5 cursor-pointer' onClick={() => selectPlaylist(id)}>
+                <div>
+                  <div className={'flex justify-center items-center size-5 rounded-sm ' + ((selectedPlaylists && selectedPlaylists.find(sp => sp == id) == 0) ? 'bg-[#3ea6ff]' : 'border-2')}>
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#212121" className="size-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                    </svg>
+                  </div>
+                </div>
+                <div>
+                  {playlist.name}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className='flex gap-2 mt-4 cursor-pointer'>
+            <div>
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+            </div>
+            <div>
+              <h1>
+                Create new playlist
+              </h1>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -5,7 +5,7 @@ const {
   uploadVideo, uploadThumbnail, publishVideo, getChannelVideos, getAllVideos,
   getVideo, search, getSubscriptionVideos, getTrendingVideos, subscribe,
   unsubscribe, likeVideo, unlikeVideo, dislikeVideo, undislikeVideo, getComments,
-  getWatchLaterVideos, getLikedVideos
+  getWatchLaterVideos, getLikedVideos, getAllPlaylists
 } = require('../controllers/Video.controller');
 
 const router = Router();
@@ -29,5 +29,6 @@ router.route('/search/:query').get(search);
 router.route('/subscriptions/:userId').get(getSubscriptionVideos);
 router.route('/trending').get(getTrendingVideos);
 router.route('/comments/:videoId').get(getComments);
+router.route('/all-playlists/:userId').get(getAllPlaylists);
 
 module.exports = router;
