@@ -5,7 +5,8 @@ const {
   uploadVideo, uploadThumbnail, publishVideo, getChannelVideos, getAllVideos,
   getVideo, search, getSubscriptionVideos, getTrendingVideos, subscribe,
   unsubscribe, likeVideo, unlikeVideo, dislikeVideo, undislikeVideo, getComments,
-  getWatchLaterVideos, getLikedVideos, getAllPlaylists
+  getWatchLaterVideos, getLikedVideos, getAllPlaylists, createPlaylist,
+  getPlaylistVideos
 } = require('../controllers/Video.controller');
 
 const router = Router();
@@ -19,6 +20,7 @@ router.route('/like').post(likeVideo);
 router.route('/unlike').post(unlikeVideo);
 router.route('/dislike').post(dislikeVideo);
 router.route('/undislike').post(undislikeVideo);
+router.route('/create-playlist').post(createPlaylist);
 
 router.route('/channel-videos/:channelId').get(getChannelVideos);
 router.route('/all-videos').get(getAllVideos);
@@ -30,5 +32,6 @@ router.route('/subscriptions/:userId').get(getSubscriptionVideos);
 router.route('/trending').get(getTrendingVideos);
 router.route('/comments/:videoId').get(getComments);
 router.route('/all-playlists/:userId').get(getAllPlaylists);
+router.route('/playlist/:userId/:playlistId').get(getPlaylistVideos);
 
 module.exports = router;

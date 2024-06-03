@@ -12,11 +12,11 @@ function PlaylistsPage() {
 
   useEffect(() => {
     if (!user) navigate('/register');
-
-    axios
-      .get('/videos/all-playlists/' + user._id)
-      .then(({data}) => setPlaylists(data.data))
-      .catch(err => console.log(err));
+    else
+      axios
+        .get('/videos/all-playlists/' + user._id)
+        .then(({data}) => setPlaylists(data.data))
+        .catch(err => console.log(err));
   }, [user]);
 
   return (
@@ -26,7 +26,7 @@ function PlaylistsPage() {
           Playlists
         </h1>
       </div>
-      <div className='mt-10'>
+      <div className='md:flex grid grid-cols-2 gap-3 mt-10'>
         {playlists && playlists.map(playlist => (
           <Link to={playlist.name == 'Watch Later' ? '/watch-later' : ('/playlist/' + playlist._id)} key={playlist._id}>
             <div className='relative'>

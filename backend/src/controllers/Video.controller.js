@@ -251,6 +251,25 @@ const undislikeVideo = asyncHandeller( async (req, res) => {
   )
 });
 
+const createPlaylist = asyncHandeller( async (req, res) => {
+  const { userId, playlistName } = req.body;
+
+  if (userId === undefined || userId === '') throw new ApiError(400, 'User missing');
+  if (playlistName === undefined || playlistName === '') throw new ApiError(400, 'Playlist name missing');
+
+  const user = await User.findById(userId);
+
+  if (!user) throw new ApiError(400, 'User not found');
+
+  const userAfterCreating = await user.createPlaylist(playlistName);
+
+  const fUser = await User.findById(userAfterCreating._id).select('-password');
+
+  return res.status(200).json(
+    new ApiResponse(200, fUser)
+  );
+});
+
 const getChannelVideos = asyncHandeller( async (req, res) => {
   const { channelId } = req.params;
 
@@ -634,7 +653,21 @@ const getAllPlaylists = asyncHandeller( async (req, res) => {
 
   if (!user || user === undefined) throw new ApiError(400, 'User not found');
 
-  var playlists = user.playlists;
+  var playlists = [];
+  
+  const likedVideos = user.likes.Videos;
+  var likedVideosThumbnail = null;
+
+  if (likedVideos.length > 0) {
+    likedVideosThumbnail = await Video.findById(likedVideos[0]);
+    playlists.push({
+      name: 'Likes',
+      videos: likedVideos,
+      thumbnail: likedVideosThumbnail.thumbnail
+    })
+  }
+  
+  playlists.push(...user.playlists);
 
   var thumbnails = await Video.find({ _id: { $in: playlists.map(playlist => playlist.videos[0] )} }).select('thumbnail');
 
@@ -643,12 +676,57 @@ const getAllPlaylists = asyncHandeller( async (req, res) => {
       name: playlist.name,
       videos: playlist.videos,
       _id: playlist._id,
-      thumbnail: thumbnails.find(thumbnail => thumbnail._id.equals(playlist.videos[0]._id)).thumbnail
+      thumbnail: thumbnails.find(thumbnail => thumbnail._id.equals(playlist.videos[0]?._id))?.thumbnail
     }
   });
 
+
   return res.status(200).json(
     new ApiResponse(200, playlists)
+  );
+});
+
+const getPlaylistVideos = asyncHandeller( async (req, res) => {
+  const { userId, playlistId } = req.params;
+
+  if (userId === undefined || userId === '') throw new ApiError(404, 'User is requires');
+  if (playlistId === undefined || playlistId === '') throw new ApiError(404, 'playlistId is required');
+
+  const user = await User.findById(userId);
+
+  if (!user) throw new ApiError(404, 'User not found');
+
+  const playlist = user.playlists.find(playlist => playlist._id.equals(playlistId));
+
+  if (!playlist) throw new ApiError(404, 'Playlist not found');
+
+  const videos = await Video.find({ _id: { $in: playlist.videos } });
+  var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
+  owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
+
+  var finalVideos = [];
+  for (let i = videos.length - 1; i >= 0; i--) {
+    if (i === videos.length - 0) videos[i].duration = 560;
+    if (i === videos.length - 1) videos[i].duration = 459;
+    if (i === videos.length - 2) videos[i].duration = 1268;
+    if (i === videos.length - 3) videos[i].duration = 25789;
+    if (i === videos.length - 4) videos[i].duration = 592;
+    if (i === videos.length - 5) videos[i].duration = 608;
+    if (i === videos.length - 6) videos[i].duration = 115;
+    
+    finalVideos.push({
+      _id: videos[i]._id,
+      thumbnail: videos[i].thumbnail,
+      title: videos[i].title,
+      views: videos[i].views,
+      duration: calcDuration(videos[i].duration),
+      channelName: owners[i].fullName,
+      description: videos[i].descripton
+    });
+  }
+
+  return res.status(200).json(
+    new ApiResponse(200, { name: playlist.name, videos: finalVideos, _id: playlist._id })
   );
 });
 
@@ -662,6 +740,7 @@ module.exports = {
   unlikeVideo,
   dislikeVideo,
   undislikeVideo,
+  createPlaylist,
   getChannelVideos,
   getAllVideos,
   getVideo,
@@ -671,5 +750,6 @@ module.exports = {
   getLikedVideos,
   search,
   getComments,
-  getAllPlaylists
+  getAllPlaylists,
+  getPlaylistVideos
 }

@@ -1,6 +1,10 @@
 const Router = require('express');
 
-const { registerUser, loginUser, uploadProfileImage, uploadProfileBanner, getUserHistory, getChannel, getSubscriptions, getYouHistory, addToWatchLater, deleteFromPlaylist, saveToPlaylist } = require('../controllers/User.controller');
+const {
+  registerUser, loginUser, uploadProfileImage, uploadProfileBanner,
+  getUserHistory, getChannel, getSubscriptions, getYouHistory,
+  addToWatchLater, deleteFromPlaylist, saveToPlaylist, getVideoInPlaylists
+} = require('../controllers/User.controller');
 const {multerUploadImg} = require('../middlewares/multer.middleware');
 
 const router = Router();
@@ -17,5 +21,6 @@ router.route('/user-history/:userId').get(getUserHistory);
 router.route('/you-history/:userId').get(getYouHistory);
 router.route('/channel/:channelName').get(getChannel);
 router.route('/subscriptions/:userId').get(getSubscriptions);
+router.route('/video-in-playlists/:userId/:videoId').get(getVideoInPlaylists);
 
 module.exports = router;

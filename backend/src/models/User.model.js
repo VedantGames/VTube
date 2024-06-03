@@ -208,10 +208,11 @@ userSchema.methods.deleteCommentOnVideo = async function (commentId) {
 }
 
 userSchema.methods.createPlaylist = async function (name) {
-  this.playlists.push({
-    name,
-    videos: []
-  });
+  if (!this.playlists.find(playlist => playlist.name === name))
+    this.playlists.push({
+      name,
+      videos: []
+    });
   await this.save();
   return this;
 }

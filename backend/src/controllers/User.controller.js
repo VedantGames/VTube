@@ -136,7 +136,7 @@ const saveToPlaylist = asyncHandeller( async (req, res) => {
   
   if (!user) throw new ApiError(400, 'User not found');
 
-  const userAfterSaving = await User.addVideoToPlaylist(playlistId, videoId);
+  const userAfterSaving = await user.addVideoToPlaylist(playlistId, videoId);
 
   const finalUser = await User.findById(userAfterSaving).select('-password');
 
@@ -156,7 +156,7 @@ const deleteFromPlaylist = asyncHandeller( async (req, res) => {
   
   if (!user) throw new ApiError(400, 'User not found');
 
-  const userAfterSaving = await User.deleteVideoFromPlaylist(playlistId, videoId);
+  const userAfterSaving = await user.deleteVideoFromPlaylist(playlistId, videoId);
 
   const finalUser = await User.findById(userAfterSaving).select('-password');
 
@@ -274,7 +274,24 @@ const getSubscriptions = asyncHandeller( async (req, res) => {
   return res.status(200).json(
     new ApiResponse(200, {subscriptions: subscriptionChannels})
   );
-})
+});
+
+const getVideoInPlaylists = asyncHandeller( async (req, res) => {
+  const { userId, videoId } = req.params;
+
+  if (videoId === undefined || videoId === '') throw new ApiError(400, 'Video is required');
+  if (userId === undefined || userId === '') throw new ApiError(400, 'User is required');
+
+  const user = await User.findById(userId);
+  
+  if (!user) throw new ApiError(400, 'User not found');
+
+  const playlists = user.playlists.filter(playlist => playlist.videos.some(video => video._id == videoId)).map(playlist => playlist._id);
+
+  return res.status(200).json(
+    new ApiResponse(200, playlists)
+  );
+});
 
 module.exports = {
   registerUser,
@@ -287,5 +304,6 @@ module.exports = {
   getUserHistory,
   getYouHistory,
   getChannel,
-  getSubscriptions
+  getSubscriptions,
+  getVideoInPlaylists
 };
