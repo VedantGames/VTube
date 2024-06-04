@@ -67,7 +67,7 @@ function YouPage() {
         </div>
         <div className='px-5 flex gap-2 overflow-x-scroll hide-scrollbar mt-2'>
           {playlists && playlists.map((playlist, i) => (
-            <Link to={'/playlist/' + playlist._id} key={i} className='min-w-40 h-full'>
+            <Link to={playlist.name == 'Likes' ? '/liked' : (playlist.name == 'Watch Later' ? '/watch-later' : ('/playlist/' + playlist._id))} key={i} className='min-w-40 h-full'>
               <div className='relative h-full'>
                 <Image cloudName='dcpi2varq' publicId={playlist.thumbnail}>
                   <Transformation crop='scale' radius='25' height='300' width='530' />

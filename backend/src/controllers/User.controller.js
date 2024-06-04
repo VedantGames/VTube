@@ -174,7 +174,8 @@ const getUserHistory = asyncHandeller( async (req, res) => {
 
   const userHistory = user.watchHistory;
 
-  const videos = await Video.find({ _id: { $in: userHistory } });
+  var videos = await Video.find({ _id: { $in: userHistory } }).limit(50);
+  videos = userHistory.map(hisVideo => videos.find(video => video._id.equals(hisVideo._id)));
   var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
   owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
 
@@ -213,7 +214,8 @@ const getYouHistory = asyncHandeller( async (req, res) => {
 
   const userHistory = user.watchHistory.slice(-16);
 
-  const videos = await Video.find({ _id: { $in: userHistory } });
+  var videos = await Video.find({ _id: { $in: userHistory } });
+  videos = userHistory.map(hisVideo => videos.find(video => video._id.equals(hisVideo._id)));
   var owners = await User.find({ _id: { $in: videos.map(video => video.owner) } });
   owners = videos.map(video => owners.find(owner => owner._id.equals(video.owner)));
 

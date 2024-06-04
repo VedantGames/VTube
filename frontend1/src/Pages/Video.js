@@ -30,6 +30,7 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
       .then(({data}) => {
         setVideo(data.data.video);
         setChannel(data.data.channel);
+        setUser(data.data.user);
       })
       .catch(err => console.log(err));
     axios

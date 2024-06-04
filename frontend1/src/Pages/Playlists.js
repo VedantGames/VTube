@@ -26,9 +26,9 @@ function PlaylistsPage() {
           Playlists
         </h1>
       </div>
-      <div className='md:flex grid grid-cols-2 gap-3 mt-10'>
+      <div className='md:flex flex-row grid grid-cols-2 gap-3 mt-10 w-full'>
         {playlists && playlists.map(playlist => (
-          <Link to={playlist.name == 'Watch Later' ? '/watch-later' : ('/playlist/' + playlist._id)} key={playlist._id}>
+          <Link to={playlist.name == 'Likes' ? '/liked' : (playlist.name == 'Watch Later' ? '/watch-later' : ('/playlist/' + playlist._id))} key={playlist._id}>
             <div className='relative'>
               <Image cloudName='dcpi2varq' publicId={playlist.thumbnail}>
                 <Transformation crop='scale' radius='10' width='255' height='143' />

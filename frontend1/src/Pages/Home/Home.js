@@ -36,10 +36,11 @@ function Home({ showSidePanel, setShowSidePanel }) {
     setShowMnu(false);
   }, [videos]);
 
-  const showMenu = ev => {
+  const showMenu = (ev, i) => {
     ev.preventDefault();
     ev.stopPropagation();
     setShowMnu(true);
+    setSelectedVid(i)
   }
   
   const menuClick = ev => {
@@ -56,7 +57,7 @@ function Home({ showSidePanel, setShowSidePanel }) {
       setTimeouts(setTimeout(() => {
         if (!canCancel)
           setHoveredVideo(id)
-      }, 1000))
+      }, 500))
   }
 
   const addToWatchLater = id => {
@@ -209,7 +210,7 @@ function Home({ showSidePanel, setShowSidePanel }) {
                   </div>
                 </div>
                 <div className='flex justify-end w-full'>
-                  <button onClick={showMenu}>
+                  <button className='hover:bg-gray-800 p-2 rounded-full' onClick={ev => showMenu(ev, i)}>
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
                       <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 12.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5ZM12 18.75a.75.75 0 1 1 0-1.5.75.75 0 0 1 0 1.5Z" />
                     </svg>
@@ -239,7 +240,6 @@ function Home({ showSidePanel, setShowSidePanel }) {
               <div className='flex gap-2 p-0.5 cursor-pointer' onClick={() => selectPlaylist(id, selectedVid)}>
                 <div>
                   <div className={'flex justify-center items-center size-5 rounded-sm ' + ((selectedPlaylists && selectedPlaylists.find(sp => sp == playlists[id]._id)) ? 'bg-[#3ea6ff]' : 'border-2')}>
-                    {console.log(selectedPlaylists, playlists, id)}
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="#212121" className="size-6">
                       <path strokeLinecap="round" strokeLinejoin="round" d="m4.5 12.75 6 6 9-13.5" />
                     </svg>

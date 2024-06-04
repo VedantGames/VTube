@@ -356,6 +356,8 @@ const getVideo = asyncHandeller( async (req, res) => {
 
   const fVideo = await video.addView();
 
+  const fUser = await User.findById(finalUser._id).select('-password');
+
   const channel = await User.findById(fVideo.owner);
 
   if (!fVideo ||!channel) throw new ApiError(400, 'Error in loading video');
@@ -376,7 +378,7 @@ const getVideo = asyncHandeller( async (req, res) => {
   }
 
   return res.status(200).json(
-    new ApiResponse(200, { video: finalVideo, channel, finalUser }, 'Success')
+    new ApiResponse(200, { video: finalVideo, channel, user: fUser }, 'Success')
   );
 });
 
