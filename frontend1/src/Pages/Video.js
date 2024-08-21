@@ -26,11 +26,12 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
 
   useEffect(() => {
     axios
-      .get('videos/video/' + videoId)
+      .get('videos/video/' + (user !== null ? user._id + '/' : '') + videoId)
       .then(({data}) => {
         setVideo(data.data.video);
         setChannel(data.data.channel);
         setUser(data.data.user);
+        console.log(data, channel, data.data.channel);
       })
       .catch(err => console.log(err));
     axios
@@ -266,8 +267,8 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
                 <div className='flex flex-col'>
                   <div className='flex items-center mt-2'>
                     <div className='size-12'>
-                      {user.profileImage !== '' ? (
-                        <Image cloudName='dcpi2varq' publicId={user.profileImage} className='rounded-full'>
+                      {user?.profileImage !== '' ? (
+                        <Image cloudName='dcpi2varq' publicId={user?.profileImage} className='rounded-full'>
 
                         </Image>
                       ) : (
