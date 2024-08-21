@@ -359,7 +359,7 @@ const getVideo = asyncHandeller( async (req, res) => {
 
   const fVideo = await video.addView();
 
-  const fUser = fUser = await User.findById(finalUser._id).select('-password');
+  const fUser = fUser = await User.findById(finalUser?._id).select('-password');
 
   const channel = await User.findById(fVideo.owner);
 
