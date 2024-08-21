@@ -342,21 +342,24 @@ const getAllVideos = asyncHandeller( async (req, res) => {
 const getVideo = asyncHandeller( async (req, res) => {
   const { userId, videoId } = req.params;
 
-  const user = await User.findById(userId);
-
-  if (user) await user.watchVideo(videoId);
+  var user = null;
+  var finalUser = null
+  if (userId !== undefined) {
+    user = await User.findById(userId);
+  
+    if (user) await user.watchVideo(videoId);
+    finalUser = await user.deleteVideoFromPlaylist('Watch Later', videoId);
+  }
 
   const video = await Video.findById(videoId);
 
   if (!video) throw new ApiError(400, 'Video not found');
 
-  const finalUser = await user.deleteVideoFromPlaylist('Watch Later', videoId);
-
   // Add video to history using cookies
 
   const fVideo = await video.addView();
 
-  const fUser = await User.findById(finalUser._id).select('-password');
+  const fUser = fUser = await User.findById(finalUser._id).select('-password');
 
   const channel = await User.findById(fVideo.owner);
 
@@ -376,7 +379,7 @@ const getVideo = asyncHandeller( async (req, res) => {
       comments: fVideo.comments
     };
   }
-
+  
   return res.status(200).json(
     new ApiResponse(200, { video: finalVideo, channel, user: fUser }, 'Success')
   );

@@ -25,6 +25,7 @@ router.route('/create-playlist').post(createPlaylist);
 router.route('/channel-videos/:channelId').get(getChannelVideos);
 router.route('/all-videos').get(getAllVideos);
 router.route('/video/:userId/:videoId').get(getVideo);
+router.route('/video/:videoId').get(getVideo);
 router.route('/watch-later/:userId').get(getWatchLaterVideos);
 router.route('/liked/:userId').get(getLikedVideos);
 router.route('/search/:query').get(search);
