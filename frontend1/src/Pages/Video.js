@@ -26,7 +26,7 @@ function VideoPage({ showSidePanel, setShowSidePanel }) {
 
   useEffect(() => {
     axios
-      .get('videos/video/' + (user ? user._id + '/' : '') + videoId)
+      .get('videos/video/' + videoId)
       .then(({data}) => {
         setVideo(data.data.video);
         setChannel(data.data.channel);
